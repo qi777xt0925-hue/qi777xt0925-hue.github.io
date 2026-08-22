@@ -3,96 +3,194 @@
     "slug": "sadae-boheom-yoyul-2026",
     "title": "2026년 4대보험 요율 총정리",
     "angle": "국민연금·건강보험·장기요양·고용보험 각각의 2026년 요율과 근로자/사업주 부담 비율, 상·하한선, 작년 대비 무엇이 바뀌었는지",
-    "keywords": ["4대보험 요율", "2026 국민연금", "건강보험료율", "장기요양보험료"],
-    "related": { "href": "../salary.html", "label": "연봉 실수령액 계산기" },
-    "published": null
+    "keywords": [
+      "4대보험 요율",
+      "2026 국민연금",
+      "건강보험료율",
+      "장기요양보험료"
+    ],
+    "related": {
+      "href": "../salary.html",
+      "label": "연봉 실수령액 계산기"
+    },
+    "published": "2026-08-22",
+    "h1": "2026년 4대보험 요율, 왜 이렇게 바뀌었나",
+    "description": "2026년 국민연금·건강보험·장기요양보험·고용보험 요율과 근로자·사업주 부담 비율, 기준소득월액 상하한선을 정리했다. 작년과 달라진 부분과 계산 시 확인할 지점을 짚는다."
   },
   {
     "slug": "yeonbong-silsuryeong-guide",
     "title": "연봉 실수령액, 왜 계산기마다 다를까",
     "angle": "간이세액표 방식과 정산 방식의 차이, 비과세 식대·부양가족 수가 실수령액에 미치는 영향, 어떤 숫자를 믿어야 하는지",
-    "keywords": ["실수령액 계산", "세후 월급", "간이세액표", "비과세 식대"],
-    "related": { "href": "../salary.html", "label": "연봉 실수령액 계산기" },
+    "keywords": [
+      "실수령액 계산",
+      "세후 월급",
+      "간이세액표",
+      "비과세 식대"
+    ],
+    "related": {
+      "href": "../salary.html",
+      "label": "연봉 실수령액 계산기"
+    },
     "published": null
   },
   {
     "slug": "yeonmal-jeongsan-basics",
     "title": "연말정산 기본 구조 이해하기",
     "angle": "소득공제와 세액공제의 차이, 결정세액이 정해지는 순서, 왜 어떤 사람은 환급받고 어떤 사람은 토해내는지",
-    "keywords": ["연말정산", "소득공제 세액공제 차이", "환급금", "결정세액"],
-    "related": { "href": "../salary.html", "label": "연봉 실수령액 계산기" },
+    "keywords": [
+      "연말정산",
+      "소득공제 세액공제 차이",
+      "환급금",
+      "결정세액"
+    ],
+    "related": {
+      "href": "../salary.html",
+      "label": "연봉 실수령액 계산기"
+    },
     "published": null
   },
   {
     "slug": "toejikgeum-gyesan",
     "title": "퇴직금 계산 방법과 평균임금 기준",
     "angle": "평균임금과 통상임금의 차이, 퇴직금 산정에 포함되는 수당과 제외되는 항목, 퇴직소득세가 붙는 구조",
-    "keywords": ["퇴직금 계산", "평균임금", "퇴직소득세", "통상임금"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "퇴직금 계산",
+      "평균임금",
+      "퇴직소득세",
+      "통상임금"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "silup-geubyeo-jogeon",
     "title": "실업급여 수급 조건과 지급액 계산",
     "angle": "고용보험 가입 기간 요건, 이직 사유별 수급 가능 여부, 구직급여일액 산정 방식과 상·하한액",
-    "keywords": ["실업급여 조건", "구직급여", "고용보험 가입기간", "실업급여 계산"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "실업급여 조건",
+      "구직급여",
+      "고용보험 가입기간",
+      "실업급여 계산"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "juhyu-sudang",
     "title": "주휴수당 조건과 계산법",
     "angle": "주 15시간 기준의 의미, 결근·지각이 주휴수당에 미치는 영향, 시급제와 월급제에서 각각 어떻게 반영되는지",
-    "keywords": ["주휴수당", "주 15시간", "최저임금 주휴수당", "시급 계산"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "주휴수당",
+      "주 15시간",
+      "최저임금 주휴수당",
+      "시급 계산"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "wollise-jeonhwanyul",
     "title": "전월세 전환율이란 무엇인가",
     "angle": "전세를 월세로 바꿀 때 적용되는 법정 전환율의 상한, 실제 시장에서 쓰이는 계산식, 세입자가 확인해야 할 지점",
-    "keywords": ["전월세 전환율", "전세 월세 전환", "법정 전환율", "보증금 월세 계산"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "전월세 전환율",
+      "전세 월세 전환",
+      "법정 전환율",
+      "보증금 월세 계산"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "wonrigeum-gyundeung",
     "title": "원리금균등과 원금균등, 무엇이 유리한가",
     "angle": "두 상환 방식의 현금흐름 차이, 총이자 차이가 생기는 이유, 중도상환을 고려할 때의 판단 기준",
-    "keywords": ["원리금균등", "원금균등", "대출 상환 방식", "총이자 비교"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "원리금균등",
+      "원금균등",
+      "대출 상환 방식",
+      "총이자 비교"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "gukmin-yeongeum-sangan",
     "title": "국민연금 기준소득월액 상한과 하한",
     "angle": "기준소득월액이 매년 조정되는 이유, 상한에 걸리면 연금 보험료와 나중에 받는 연금액이 어떻게 되는지",
-    "keywords": ["기준소득월액", "국민연금 상한", "국민연금 보험료", "연금 수령액"],
-    "related": { "href": "../salary.html", "label": "연봉 실수령액 계산기" },
+    "keywords": [
+      "기준소득월액",
+      "국민연금 상한",
+      "국민연금 보험료",
+      "연금 수령액"
+    ],
+    "related": {
+      "href": "../salary.html",
+      "label": "연봉 실수령액 계산기"
+    },
     "published": null
   },
   {
     "slug": "pyeongsu-jegopmiteo",
     "title": "평수와 제곱미터, 전용면적과 공급면적",
     "angle": "평 단위 환산의 기준, 전용·공급·계약면적이 각각 무엇을 포함하는지, 분양 광고의 면적 표기를 읽는 법",
-    "keywords": ["평수 계산", "제곱미터 변환", "전용면적 공급면적", "분양면적"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "평수 계산",
+      "제곱미터 변환",
+      "전용면적 공급면적",
+      "분양면적"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "geullo-jangryeo-geumpum",
     "title": "근로장려금 신청 자격과 지급액",
     "angle": "가구 유형별 소득·재산 요건, 신청 시기와 방법, 자녀장려금과의 관계 및 중복 수급 가능 여부",
-    "keywords": ["근로장려금", "자녀장려금", "신청 자격", "지급액"],
-    "related": { "href": "../index.html", "label": "계산기 전체 목록" },
+    "keywords": [
+      "근로장려금",
+      "자녀장려금",
+      "신청 자격",
+      "지급액"
+    ],
+    "related": {
+      "href": "../index.html",
+      "label": "계산기 전체 목록"
+    },
     "published": null
   },
   {
     "slug": "yeonbong-hyeopsang",
     "title": "연봉 협상 전에 계산해둬야 할 것들",
     "angle": "세전 인상액이 세후로 얼마나 남는지, 구간이 바뀔 때의 체감 차이, 연봉 외 항목(퇴직금·수당·복리후생)을 금액으로 환산하는 법",
-    "keywords": ["연봉 협상", "세후 인상액", "연봉 실수령액", "복리후생 환산"],
-    "related": { "href": "../salary.html", "label": "연봉 실수령액 계산기" },
+    "keywords": [
+      "연봉 협상",
+      "세후 인상액",
+      "연봉 실수령액",
+      "복리후생 환산"
+    ],
+    "related": {
+      "href": "../salary.html",
+      "label": "연봉 실수령액 계산기"
+    },
     "published": null
   }
 ]
