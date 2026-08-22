@@ -1,10 +1,10 @@
 name: 가이드 글 생성
 
-# 월·수·금 오전 9시(KST)에 한 편씩 생성해 Pull Request로 올립니다.
+# 매주 금요일 오전 9시(KST)에 한 편 생성해 Pull Request로 올립니다.
 # 검토 후 머지하면 pages.yml이 배포합니다.
 on:
   schedule:
-    - cron: '0 0 * * 1,3,5' # UTC 00:00 = KST 09:00
+    - cron: '0 0 * * 5' # UTC 금 00:00 = KST 금 09:00
   workflow_dispatch:
     inputs:
       count:

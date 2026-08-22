@@ -77,7 +77,7 @@ npm run build
 
 ## 자동 실행
 
-`.github/workflows/publish.yml`이 월·수·금 오전 9시(KST)에 한 편씩 생성해 **Pull Request로 올립니다.** 검토하고 머지하면 `pages.yml`이 `site/`를 GitHub Pages에 배포합니다.
+`.github/workflows/publish.yml`이 매주 금요일 오전 9시(KST)에 한 편 생성해 **Pull Request로 올립니다.** 검토하고 머지하면 `pages.yml`이 `site/`를 GitHub Pages에 배포합니다.
 
 리포지터리 Settings → Secrets and variables → Actions에 `ANTHROPIC_API_KEY`를 등록해야 동작합니다.
 
