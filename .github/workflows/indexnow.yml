@@ -1,0 +1,66 @@
+name: 검색엔진 색인 통보
+
+# 사이트가 갱신되면 바뀐 페이지를 네이버와 Bing에 알립니다(IndexNow 프로토콜).
+# 구글은 IndexNow를 지원하지 않으므로 Search Console에서 수동 요청해야 합니다.
+#
+# 배포(pages.yml)와 분리해 둡니다. 여기가 실패해도 사이트 배포에는 영향이 없습니다.
+on:
+  push:
+    branches: [main]
+    paths: ['site/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 바뀐 페이지 통보
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: 77088601589f5d3daae39f8ac9c025ac
+          SITE_HOST: qi777xt0925-hue.github.io
+        run: |
+          set -u
+
+          # 이번 커밋에서 바뀐 site/ 아래 html 을 찾습니다.
+          # git pathspec 의 ** 는 의도대로 동작하지 않아 grep 으로 거릅니다.
+          CHANGED=$(git diff --name-only --diff-filter=d HEAD~1 HEAD -- site || true)
+          PAGES=$(printf '%s\n' "$CHANGED" | grep -E '[.]html$' || true)
+
+          if [ -z "$PAGES" ]; then
+            echo "바뀐 페이지가 없어 통보하지 않습니다."
+            exit 0
+          fi
+
+          # site/foo.html -> https://호스트/foo.html, index.html 은 디렉터리 주소로
+          URLS=$(printf '%s\n' "$PAGES" \
+                 | sed "s|^site/|https://${SITE_HOST}/|" \
+                 | sed "s|/index[.]html$|/|")
+
+          echo "통보할 페이지:"
+          printf '%s\n' "$URLS" | sed 's/^/  /'
+
+          BODY=$(printf '%s\n' "$URLS" | jq -R . | jq -s \
+            --arg host "$SITE_HOST" \
+            --arg key "$INDEXNOW_KEY" \
+            --arg loc "https://${SITE_HOST}/${INDEXNOW_KEY}.txt" \
+            '{host: $host, key: $key, keyLocation: $loc, urlList: .}')
+
+          if ! printf '%s' "$BODY" | jq -e . > /dev/null 2>&1; then
+            echo "요청 본문 생성에 실패해 건너뜁니다."
+            exit 0
+          fi
+
+          for ENDPOINT in https://api.indexnow.org/indexnow https://searchadvisor.naver.com/indexnow; do
+            CODE=$(curl -sS -m 30 -o /dev/null -w '%{http_code}' -X POST "$ENDPOINT" \
+              -H 'Content-Type: application/json; charset=utf-8' \
+              --data "$BODY" || echo 000)
+            echo "${ENDPOINT} -> HTTP ${CODE}"
+          done
