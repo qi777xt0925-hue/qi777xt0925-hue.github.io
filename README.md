@@ -16,7 +16,16 @@ pipeline/                 글 자동 생성 (자세한 내용은 pipeline/README
 .github/workflows/
   publish.yml             월·수·금 오전 9시(KST) 글 생성 → PR
   pages.yml               site/ 변경 시 자동 배포
+serve.ps1                 로컬 미리보기 서버 (http://localhost:8787)
 ```
+
+## 로컬에서 보기
+
+```powershell
+powershell -ExecutionPolicy Bypass -File serve.ps1
+```
+
+브라우저에서 http://localhost:8787 접속.
 
 ## 어떻게 돌아가나
 
