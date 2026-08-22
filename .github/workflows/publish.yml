@@ -1,0 +1,92 @@
+name: 가이드 글 생성
+
+# 월·수·금 오전 9시(KST)에 한 편씩 생성해 Pull Request로 올립니다.
+# 검토 후 머지하면 pages.yml이 배포합니다.
+on:
+  schedule:
+    - cron: '0 0 * * 1,3,5' # UTC 00:00 = KST 09:00
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '생성할 글 수'
+        required: false
+        default: '1'
+      direct:
+        description: 'PR 없이 main에 바로 커밋'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 의존성 설치
+        working-directory: pipeline
+        run: npm ci || npm install
+
+      - name: 주제 큐 보충
+        working-directory: pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node replenish.mjs
+
+      - name: 글 생성
+        working-directory: pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node generate.mjs --count "${{ github.event.inputs.count || '1' }}"
+
+      - name: 목록·사이트맵 재생성
+        working-directory: pipeline
+        run: node build.mjs
+
+      - name: 변경 사항 확인
+        id: diff
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "생성된 변경 사항이 없습니다."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 커밋
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "content-bot"
+          git config user.email "content-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "글 발행: $(date -u +%Y-%m-%d)"
+
+      - name: main에 직접 푸시
+        if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct == 'true'
+        run: git push
+
+      - name: Pull Request 생성
+        if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="post/$(date -u +%Y%m%d-%H%M)"
+          git checkout -b "$BRANCH"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "새 가이드 글 ($(date -u +%Y-%m-%d))" \
+            --body "자동 생성된 초안입니다. 수치와 제도 설명이 정확한지 확인한 뒤 머지하세요." \
+            --base "${{ github.ref_name }}" \
+            --head "$BRANCH"

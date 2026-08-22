@@ -1,0 +1,19 @@
+{
+  "name": "gyesangilab-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "계산기랩 콘텐츠 생성 파이프라인",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "draft": "node generate.mjs --draft",
+    "build": "node build.mjs",
+    "publish": "node generate.mjs && node build.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0"
+  }
+}
