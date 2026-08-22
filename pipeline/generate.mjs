@@ -41,7 +41,11 @@ const ARTICLE_SCHEMA = {
   additionalProperties: false,
   required: ['title', 'h1', 'description', 'lead', 'sections', 'faq', 'sources'],
   properties: {
-    title: { type: 'string', description: '<title> 태그용. 사이트명 제외 45자 이내.' },
+    title: {
+      type: 'string',
+      description:
+        '<title> 태그용. 사이트명 제외 32자 이내. 모바일 검색결과는 30자 안팎에서 잘리므로 핵심 단어를 앞에 두세요.',
+    },
     h1: { type: 'string', description: '본문 대제목. title과 달라도 됨.' },
     description: { type: 'string', description: 'meta description. 90~150자.' },
     lead: { type: 'string', description: '도입 한두 문장. 이 글이 무엇을 알려주는지.' },

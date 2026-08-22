@@ -187,7 +187,7 @@ export function renderIndexPage(posts, config) {
 <header class="site">
   <div class="wrap">
     <a class="logo" href="index.html">계산기<span>랩</span></a>
-    <nav><a href="index.html">전체 계산기</a></nav>
+    <nav><a href="salary.html">연봉 계산기</a><a href="index.html">전체 계산기</a></nav>
   </div>
 </header>
 
