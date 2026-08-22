@@ -99,6 +99,7 @@ ${renderFaq(article.faq)}
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
     요율과 제도는 변경될 수 있으니 최종 확인은 관계 기관 공식 자료를 따르세요.
+    <br><a href="../privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
@@ -157,6 +158,7 @@ ${items}
 <footer class="site">
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+    <br><a href="privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
