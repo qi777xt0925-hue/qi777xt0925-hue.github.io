@@ -14,7 +14,7 @@ site/                     배포되는 파일 전부 (이 폴더만 공개됩니
   assets/tax2026.js       요율·세율 계산 엔진  ← 요율 바뀌면 여기만 수정
 pipeline/                 글 자동 생성 (자세한 내용은 pipeline/README.md)
 .github/workflows/
-  publish.yml             월·수·금 오전 9시(KST) 글 생성 → PR
+  publish.yml             매주 금요일 오전 9시(KST) 글 생성 → PR
   pages.yml               site/ 변경 시 자동 배포
 serve.ps1                 로컬 미리보기 서버 (http://localhost:8787)
 ```
@@ -29,13 +29,19 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 
 ## 어떻게 돌아가나
 
-1. `publish.yml`이 월·수·금 오전 9시에 실행됩니다 (GitHub 서버에서 — 내 컴퓨터는 꺼져 있어도 됩니다)
+1. `publish.yml`이 매주 금요일 오전 9시에 실행됩니다 (GitHub 서버에서 — 내 컴퓨터는 꺼져 있어도 됩니다)
 2. 대기 주제가 8개 미만이면 `replenish.mjs`가 새 주제를 채웁니다
 3. `generate.mjs`가 글 한 편을 쓰고, `build.mjs`가 목록·사이트맵을 갱신합니다
 4. Pull Request가 하나 올라옵니다
 5. **내용을 확인하고 머지하면** `pages.yml`이 사이트를 다시 배포합니다
 
 4~5단계에 사람이 한 번 개입하는 건 의도된 설계입니다. 이유는 `pipeline/README.md`의 "왜 PR을 거치나"를 보세요.
+
+## 왜 주 1회인가
+
+`guides.html`·`sitemap.xml`·`index.html`은 글이 추가될 때마다 통째로 다시 생성됩니다. 그래서 PR이 둘 이상 열려 있으면 서로 같은 줄을 다르게 고쳐 **머지 충돌**이 납니다.
+
+주 1회 발행이면 PR이 항상 하나만 존재하므로 이 문제가 생기지 않습니다. 발행 주기를 늘리려면 머지도 그만큼 자주 해야 하고, PR을 쌓아두지 않아야 합니다.
 
 ## 필요한 설정
 

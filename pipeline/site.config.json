@@ -5,6 +5,7 @@
   "model": "claude-sonnet-5",
   "effort": "medium",
   "maxTokens": 16000,
+  "maxSearches": 3,
   "pricing": {
     "inputPerMTok": 3,
     "outputPerMTok": 15

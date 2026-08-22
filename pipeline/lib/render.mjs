@@ -37,15 +37,58 @@ function renderFaq(faq) {
   return `\n  <h2>자주 묻는 질문</h2>\n${items}\n`;
 }
 
+/** 본문 근거가 된 공식 자료. E-E-A-T 신호이자 독자가 직접 확인할 통로입니다. */
+function renderSources(sources) {
+  if (!sources?.length) return '';
+  const items = sources
+    .map(
+      (s) =>
+        `    <li><a href="${esc(s.url)}" rel="nofollow noopener" target="_blank">${esc(s.name)}</a></li>`
+    )
+    .join('\n');
+  return `\n  <h2>참고한 자료</h2>\n  <ul>\n${items}\n  </ul>\n`;
+}
+
+/** 같은 폴더의 다른 글로 연결합니다. 크롤링 경로를 늘리고 체류시간을 높입니다. */
+function renderMorePosts(others) {
+  if (!others?.length) return '';
+  const items = others
+    .slice(-4)
+    .reverse()
+    .map(
+      (p) => `    <a class="item" href="${esc(encodeURIComponent(p.slug))}.html">
+      <div class="t">${esc(p.h1 ?? p.title)}</div>
+      <div class="d">${esc(p.description ?? '')}</div>
+    </a>`
+    )
+    .join('\n');
+  return `\n  <h2>다른 글</h2>\n  <div class="list">\n${items}\n  </div>\n`;
+}
+
 /**
  * @param {object} article  모델이 생성한 글 데이터
  * @param {object} topic    topics.json 항목 (slug, related)
  * @param {object} config   site.config.json
  * @param {string} date     YYYY-MM-DD
+ * @param {Array}  others   이미 발행된 다른 글 (내부 링크용)
  */
-export function renderPost(article, topic, config, date) {
+export function renderPost(article, topic, config, date, others = []) {
   const url = encodeURI(`${config.origin}/posts/${topic.slug}.html`);
   const rel = topic.related;
+
+  // 검색엔진이 글쓴이·발행일·소속을 구조적으로 읽게 합니다. 금융 주제(YMYL)에서 특히 중요합니다.
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.description,
+    datePublished: date,
+    dateModified: date,
+    inLanguage: 'ko-KR',
+    author: { '@type': 'Organization', name: config.author },
+    publisher: { '@type': 'Organization', name: config.siteName },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  }).replace(/</g, '\\u003c');
 
   const relatedBox = rel
     ? `\n  <div class="list">
@@ -69,6 +112,8 @@ export function renderPost(article, topic, config, date) {
 <meta property="og:description" content="${esc(article.description)}">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="${esc(date)}">
+<meta property="article:modified_time" content="${esc(date)}">
+<script type="application/ld+json">${jsonLd}</script>
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="${FAVICON}">
 <!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
@@ -93,12 +138,15 @@ ${(article.sections ?? []).map(renderSection).join('\n\n')}
 ${relatedBox}
   <div class="ad"><!-- 광고 슬롯 --></div>
 ${renderFaq(article.faq)}
+${renderSources(article.sources)}
+${renderMorePosts(others)}
 </main>
 
 <footer class="site">
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
     요율과 제도는 변경될 수 있으니 최종 확인은 관계 기관 공식 자료를 따르세요.
+    <br>최종 수정: ${esc(date)} · <a href="../privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
@@ -157,6 +205,7 @@ ${items}
 <footer class="site">
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+    <br><a href="privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
