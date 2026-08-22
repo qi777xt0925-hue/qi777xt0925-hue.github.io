@@ -2,7 +2,11 @@
   "siteName": "계산기랩",
   "origin": "https://qi777xt0925-hue.github.io",
   "author": "계산기랩",
-  "model": "claude-opus-5",
+  "model": "claude-sonnet-5",
   "effort": "medium",
-  "maxTokens": 16000
+  "maxTokens": 16000,
+  "pricing": {
+    "inputPerMTok": 3,
+    "outputPerMTok": 15
+  }
 }

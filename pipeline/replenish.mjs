@@ -146,7 +146,9 @@ const raw = response.content.filter((b) => b.type === 'text').at(-1)?.text;
 if (!raw) throw new Error('응답에 텍스트 블록이 없습니다.');
 
 const usage = response.usage;
-const cost = (usage.input_tokens / 1e6) * 5 + (usage.output_tokens / 1e6) * 25;
+const cost =
+  (usage.input_tokens / 1e6) * config.pricing.inputPerMTok +
+  (usage.output_tokens / 1e6) * config.pricing.outputPerMTok;
 console.log(`토큰 ${usage.input_tokens} in / ${usage.output_tokens} out · 약 $${cost.toFixed(3)}`);
 
 // ── 검증 후 추가 ────────────────────────────────────────────

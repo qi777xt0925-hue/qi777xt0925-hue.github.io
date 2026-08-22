@@ -154,7 +154,8 @@ async function writeArticle(topic) {
 
   const usage = response.usage;
   const cost =
-    (usage.input_tokens / 1e6) * 5 + (usage.output_tokens / 1e6) * 25; // Opus 5 기준 $5 / $25 per MTok
+    (usage.input_tokens / 1e6) * config.pricing.inputPerMTok +
+    (usage.output_tokens / 1e6) * config.pricing.outputPerMTok;
   console.log(
     `    토큰 ${usage.input_tokens} in / ${usage.output_tokens} out · 약 $${cost.toFixed(3)}`
   );

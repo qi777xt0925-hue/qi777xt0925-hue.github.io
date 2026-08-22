@@ -63,19 +63,21 @@ npm run build
 
 ## 비용
 
-Claude Opus 5 기준 입력 $5 / 출력 $25 per 1M 토큰. 웹 검색은 1,000회당 $10.
+요율은 `site.config.json`의 `pricing`에서 읽습니다. 모델을 바꾸면 이 값도 같이 바꾸세요 — 안 그러면 콘솔에 찍히는 비용이 틀립니다.
 
-글 한 편에 대략 **$0.15~0.4** 정도이고, 실행할 때마다 실제 사용량이 콘솔에 찍힙니다. 주 3회 발행이면 월 $2~5 수준입니다.
+현재 설정은 Claude Sonnet 5 기준 입력 $3 / 출력 $15 per 1M 토큰. 웹 검색은 별도로 1,000회당 $10입니다(이 계산에는 안 들어갑니다).
 
-싸게 가려면 `site.config.json`에서:
+글 한 편에 대략 **$0.1~0.2**, 주 3회 발행이면 월 $1~3 수준입니다. 실행할 때마다 실제 토큰 사용량이 콘솔에 찍힙니다.
+
+더 싸게 가려면:
 
 - `effort`를 `"low"`로 (품질 하락은 생각보다 작습니다)
-- `model`을 `"claude-sonnet-5"`로 (입력 $3 / 출력 $15)
-- `--no-search`로 실행 (검색 비용 제거, 대신 수치 정확도 하락)
+- `model`을 `"claude-haiku-4-5"`로 + `pricing`을 `1` / `5`로 (대신 세금·요율 같은 수치 정확도가 떨어집니다. 이 사이트 주제에는 권하지 않습니다)
+- `--no-search`로 실행 (검색 비용은 사라지지만 최신 수치를 못 씁니다)
 
 ## 자동 실행
 
-`.github/workflows/publish.yml`이 월·수·금 오전 9시(KST)에 한 편씩 생성해 **Pull Request로 올립니다.** 검토하고 머지하면 `deploy.yml`이 공개 저장소(qi777xt0925-hue.github.io)로 밀어넣고, GitHub Pages가 배포합니다.
+`.github/workflows/publish.yml`이 월·수·금 오전 9시(KST)에 한 편씩 생성해 **Pull Request로 올립니다.** 검토하고 머지하면 `pages.yml`이 `site/`를 GitHub Pages에 배포합니다.
 
 리포지터리 Settings → Secrets and variables → Actions에 `ANTHROPIC_API_KEY`를 등록해야 동작합니다.
 
