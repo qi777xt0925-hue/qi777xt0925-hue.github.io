@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://qi777xt0925-hue.github.io/sitemap.xml

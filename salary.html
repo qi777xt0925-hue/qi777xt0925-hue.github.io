@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>연봉 실수령액 계산기 2026 | 세후 월급 바로 확인 - 계산기랩</title>
+<meta name="description" content="2026년 최신 4대보험 요율과 소득세를 반영한 연봉 실수령액 계산기. 연봉만 넣으면 세후 월급과 국민연금·건강보험·소득세 공제 내역을 바로 보여줍니다.">
+<link rel="canonical" href="https://example.com/salary.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="연봉 실수령액 계산기 2026 | 세후 월급 바로 확인">
+<meta property="og:description" content="2026년 4대보험 요율 반영. 연봉 입력 한 번으로 실수령액과 공제 내역 확인.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>연봉 실수령액 계산기</h1>
+  <p class="lead">2026년 기준 4대보험 요율과 근로소득세를 반영합니다. 연봉만 입력하면 세후 월급이 바로 나옵니다.</p>
+
+  <section class="card">
+    <div class="field">
+      <label for="annual">연봉 <span class="hint">세전, 계약 기준</span></label>
+      <div class="inputrow">
+        <input type="text" id="annual" inputmode="numeric" value="4,000" aria-describedby="annualUnit">
+        <span class="unit" id="annualUnit">만원</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="field">
+      <label>퇴직금</label>
+      <div class="seg" id="sev">
+        <button type="button" data-v="0" aria-pressed="true">별도 (연봉에 미포함)</button>
+        <button type="button" data-v="1" aria-pressed="false">연봉에 포함</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="taxfree">월 비과세액 <span class="hint">식대 등</span></label>
+        <div class="inputrow">
+          <input type="text" id="taxfree" inputmode="numeric" value="200,000">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="dep">부양가족 수 <span class="hint">본인 포함</span></label>
+        <div class="inputrow">
+          <input type="number" id="dep" inputmode="numeric" value="1" min="1" max="10" style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+          <span class="unit">명</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap">월 실수령액</div>
+    <div class="big" id="net">–</div>
+    <div class="sub" id="sub">–</div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>공제 내역 상세</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>월 급여 (세전)</th><td id="r-gross">–</td></tr>
+        <tr><th>ㄴ 과세 대상</th><td id="r-taxable">–</td></tr>
+        <tr><th>ㄴ 비과세</th><td id="r-free">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">공제 항목</th><td style="padding-top:18px"></td></tr>
+        <tr class="neg"><th>국민연금 (4.75%)</th><td id="r-pension">–</td></tr>
+        <tr class="neg"><th>건강보험 (3.595%)</th><td id="r-health">–</td></tr>
+        <tr class="neg"><th>장기요양 (건보료의 12.95%)</th><td id="r-ltc">–</td></tr>
+        <tr class="neg"><th>고용보험 (0.9%)</th><td id="r-employ">–</td></tr>
+        <tr class="neg"><th>소득세</th><td id="r-income">–</td></tr>
+        <tr class="neg"><th>지방소득세 (소득세의 10%)</th><td id="r-local">–</td></tr>
+        <tr class="tot neg"><th>공제 합계</th><td id="r-total">–</td></tr>
+        <tr class="tot"><th>실수령액</th><td id="r-net">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    연 실수령액은 <strong id="r-netyear">–</strong>, 공제율은 <strong id="r-rate">–</strong>입니다.
+  </div>
+
+  <h2>연봉별 실수령액 표</h2>
+  <p class="lead" style="margin-bottom:12px">비과세 20만원 · 부양가족 1명 · 퇴직금 별도 기준입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>연봉</th><th>월 실수령액</th><th>월 공제액</th><th>연 실수령액</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>실수령액은 이렇게 계산됩니다</h2>
+  <p>연봉에서 빠져나가는 돈은 크게 <strong>4대보험</strong>과 <strong>세금</strong> 두 덩어리입니다. 순서대로 보면 이렇습니다.</p>
+
+  <h3>1. 과세 대상 급여를 먼저 구합니다</h3>
+  <p>월 급여 전체가 아니라, 식대 같은 <strong>비과세 항목을 뺀 금액</strong>이 기준입니다. 비과세 식대는 월 20만원까지 인정되며, 이 금액이 클수록 보험료와 세금이 함께 줄어 실수령액이 올라갑니다.</p>
+
+  <h3>2. 4대보험을 뗍니다 (2026년 요율)</h3>
+  <ul>
+    <li><strong>국민연금</strong> — 근로자 4.75% (전체 9.5%를 회사와 절반씩). 기준소득월액에 상한이 있어 월 659만원을 넘는 부분에는 부과되지 않습니다.</li>
+    <li><strong>건강보험</strong> — 근로자 3.595% (전체 7.19%).</li>
+    <li><strong>장기요양보험</strong> — 건강보험료의 12.95%.</li>
+    <li><strong>고용보험</strong> — 근로자 0.9%. 산재보험은 회사가 전액 부담하므로 급여에서 빠지지 않습니다.</li>
+  </ul>
+  <p>국민연금에 상한이 있다는 점 때문에, 고연봉일수록 <em>공제율 자체는 오히려 낮아지는</em> 구간이 생깁니다.</p>
+
+  <h3>3. 소득세를 계산합니다</h3>
+  <p>연간 총급여에서 근로소득공제를 빼고, 인적공제(1인당 150만원)와 이미 낸 보험료를 뺀 금액이 <strong>과세표준</strong>입니다. 여기에 6~45% 누진세율을 적용해 산출세액을 구한 뒤, 근로소득세액공제를 빼면 최종 세액이 나옵니다. 마지막으로 소득세의 10%가 <strong>지방소득세</strong>로 추가됩니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>실제 월급명세서 금액과 몇천원 차이가 나요</summary>
+    <div class="body">회사가 매달 떼는 소득세는 국세청 <strong>근로소득 간이세액표</strong>를 따르는데, 이 표는 계산 편의를 위해 만들어진 근사표입니다. 이 계산기는 세법상 정식 계산식을 12로 나눠 보여주기 때문에 매달 금액에 약간의 차이가 생길 수 있습니다. 어느 쪽이든 <strong>연말정산에서 정확한 금액으로 정산</strong>되므로 1년 총액은 같아집니다.</div>
+  </details>
+  <details>
+    <summary>퇴직금 포함 연봉이면 뭐가 달라지나요</summary>
+    <div class="body">퇴직금이 연봉에 포함된 계약은 보통 연봉을 13으로 나눈 금액이 실제 월 급여가 됩니다. 즉 같은 연봉이라도 <strong>매달 받는 돈이 약 7.7% 줄어듭니다</strong>. 위에서 '연봉에 포함'을 누르면 이 방식으로 계산합니다.</div>
+  </details>
+  <details>
+    <summary>부양가족 수는 어떻게 세나요</summary>
+    <div class="body">본인을 반드시 1명으로 포함하고, 소득 요건과 나이 요건을 충족하는 배우자·부모·자녀를 더합니다. 배우자는 연 소득 100만원(근로소득만 있으면 총급여 500만원) 이하일 때 해당됩니다.</div>
+  </details>
+  <details>
+    <summary>연말정산 환급액도 알 수 있나요</summary>
+    <div class="body">이 계산기는 기본공제만 반영합니다. 의료비·교육비·기부금·주택자금·연금저축 같은 <strong>개인별 공제 항목은 포함하지 않았습니다</strong>. 실제 연말정산에서는 이런 공제가 더해져 환급이 발생하는 경우가 많으므로, 여기 나온 세금은 '공제를 전혀 받지 않았을 때의 상한선'에 가깝다고 보시면 됩니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    2026년 7월 개정 요율 기준(국민연금 9.5%·기준소득월액 상한 659만원, 건강보험 7.19%, 장기요양 12.95%, 고용보험 0.9%)으로 계산합니다.
+    기본공제 외 개인별 소득·세액공제와 자녀세액공제는 반영하지 않으며, 실제 원천징수액은 간이세액표에 따라 다를 수 있습니다.
+    참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 2026년 기준 · <a href="index.html">전체 계산기 보기</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"연봉 실수령액 계산기 2026","applicationCategory":"FinanceApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"2026년 4대보험 요율과 근로소득세를 반영해 연봉에서 세후 월급을 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"실제 월급명세서 금액과 차이가 나는 이유는?","acceptedAnswer":{"@type":"Answer","text":"회사가 매달 떼는 소득세는 국세청 근로소득 간이세액표를 따르는 근사값입니다. 이 계산기는 세법상 정식 계산식을 12로 나눈 값이라 매달 금액에 차이가 생길 수 있으며, 연말정산에서 정산되어 연 총액은 같아집니다."}},
+{"@type":"Question","name":"퇴직금이 연봉에 포함되면 어떻게 되나요?","acceptedAnswer":{"@type":"Answer","text":"퇴직금 포함 연봉은 보통 연봉을 13으로 나눈 금액이 월 급여가 되어, 같은 연봉이라도 매달 받는 금액이 약 7.7% 줄어듭니다."}},
+{"@type":"Question","name":"2026년 4대보험 요율은 얼마인가요?","acceptedAnswer":{"@type":"Answer","text":"근로자 부담 기준으로 국민연금 4.75%, 건강보험 3.595%, 장기요양보험은 건강보험료의 12.95%, 고용보험 0.9%입니다."}}]}
+</script>
+
+<script src="assets/tax2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const annual = $('annual'), taxfree = $('taxfree'), dep = $('dep');
+  let severance = 0;
+
+  // 연봉 빠른 선택 칩
+  const presets = [2500, 3000, 3500, 4000, 5000, 6000, 8000, 10000];
+  $('chips').innerHTML = presets.map(v =>
+    `<button type="button" class="chip" data-v="${v}">${v >= 10000 ? (v/10000)+'억' : v.toLocaleString()+'만'}</button>`
+  ).join('');
+  $('chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    annual.value = Number(b.dataset.v).toLocaleString('ko-KR');
+    render();
+  });
+
+  // 퇴직금 토글
+  $('sev').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    [...$('sev').children].forEach(x => x.setAttribute('aria-pressed', x === b));
+    severance = Number(b.dataset.v);
+    render();
+  });
+
+  attachComma(annual, render);
+  attachComma(taxfree, render);
+  dep.addEventListener('input', render);
+
+  function render(){
+    const won0 = numOf(annual) * 10000;
+    if (won0 <= 0){ $('net').textContent = '–'; $('sub').textContent = '연봉을 입력해 주세요'; return; }
+
+    const r = calcNetPay(won0, numOf(taxfree), Number(dep.value) || 1, severance === 1);
+
+    $('net').textContent = won(r.net) + '원';
+    $('sub').textContent = `연 실수령 ${man(r.netYear)}만원 · 월 공제 ${won(r.totalDeduction)}원`;
+
+    $('r-gross').textContent   = won(r.grossMonth) + '원';
+    $('r-taxable').textContent = won(r.taxableMonth) + '원';
+    $('r-free').textContent    = won(r.taxFree) + '원';
+    $('r-pension').textContent = '-' + won(r.pension) + '원';
+    $('r-health').textContent  = '-' + won(r.health) + '원';
+    $('r-ltc').textContent     = '-' + won(r.ltc) + '원';
+    $('r-employ').textContent  = '-' + won(r.employ) + '원';
+    $('r-income').textContent  = '-' + won(r.incomeTax) + '원';
+    $('r-local').textContent   = '-' + won(r.localTax) + '원';
+    $('r-total').textContent   = '-' + won(r.totalDeduction) + '원';
+    $('r-net').textContent     = won(r.net) + '원';
+    $('r-netyear').textContent = won(r.netYear) + '원';
+    $('r-rate').textContent    = (r.totalDeduction / r.grossMonth * 100).toFixed(1) + '%';
+
+    buildTable(numOf(annual));
+  }
+
+  function buildTable(currentMan){
+    const rows = [];
+    for (let m = 2400; m <= 12000; m += (m < 6000 ? 200 : 500)) rows.push(m);
+    const nearest = rows.reduce((a, b) => Math.abs(b - currentMan) < Math.abs(a - currentMan) ? b : a);
+    $('cmp').innerHTML = rows.map(m => {
+      const r = calcNetPay(m * 10000, 200000, 1, false);
+      return `<tr class="${m === nearest ? 'hi' : ''}">
+        <td>${m.toLocaleString()}만원</td>
+        <td>${won(r.net)}원</td>
+        <td>${won(r.totalDeduction)}원</td>
+        <td>${man(r.netYear)}만원</td></tr>`;
+    }).join('');
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
