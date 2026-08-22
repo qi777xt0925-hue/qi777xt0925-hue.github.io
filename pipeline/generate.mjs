@@ -110,7 +110,7 @@ async function writeArticle(topic) {
   }`;
 
   const tools = USE_SEARCH
-    ? [{ type: 'web_search_20260209', name: 'web_search', max_uses: 6 }]
+    ? [{ type: 'web_search_20260209', name: 'web_search', max_uses: config.maxSearches }]
     : undefined;
 
   const messages = [{ role: 'user', content: userPrompt }];
