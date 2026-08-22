@@ -57,9 +57,8 @@ https://platform.claude.com/settings/billing
 
 짧은 것부터. 급한 건 없습니다.
 
-- [ ] **네이버 웹페이지 수집 요청** — searchadvisor.naver.com → 요청 → 웹 페이지 수집
-      `https://qi777xt0925-hue.github.io/posts/sadae-boheom-yoyul-2026.html`
-      (사이트 등록·소유확인·사이트맵 제출은 완료됨)
+- [ ] **Bing 웹마스터 등록** (선택, 5분) — bing.com/webmasters
+      IndexNow로 이미 통보는 가고 있어서 필수는 아닙니다. 등록하면 노출 통계를 볼 수 있습니다.
 - [ ] **Bing 웹마스터 등록** (5분, 무료) — bing.com/webmasters
       Search Console에서 가져오기 기능이 있어 클릭 몇 번이면 끝납니다.
       점유율은 낮지만 ChatGPT·코파일럿 검색이 Bing 색인을 씁니다.
@@ -71,6 +70,6 @@ https://platform.claude.com/settings/billing
 ## 새 글이 나올 때마다 하면 좋은 것
 
 - **구글**: Search Console → URL 검사 → 주소 입력 → **색인 생성 요청**
-- **네이버**: 서치어드바이저 → 요청 → **웹 페이지 수집**
+- **네이버·Bing**: 자동입니다. 배포될 때 IndexNow로 통보됩니다(pages.yml). 할 일 없음.
 
 둘 다 "이 글 지금 가져가라"는 직접 요청입니다. 안 해도 사이트맵으로 언젠가 잡히지만, 하면 며칠 빨라집니다.
