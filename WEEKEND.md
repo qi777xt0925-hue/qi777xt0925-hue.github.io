@@ -38,7 +38,7 @@ https://search.google.com/search-console → 실적
 
 https://platform.claude.com/settings/billing
 
-글 한 편에 약 $0.5입니다. $5로 10편 정도.
+글 한 편에 약 $0.35입니다(실측 기준). 비용은 **금요일에 글이 생성되는 순간** 나가며, PR을 머지하든 안 하든 이미 차감된 상태입니다.
 잔액이 떨어지면 워크플로가 실패하고 GitHub이 이메일로 알려줍니다.
 
 계속하려면 크레딧을 충전하면 되고, 그만두려면 그냥 두면 됩니다
