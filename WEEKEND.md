@@ -53,8 +53,24 @@ https://platform.claude.com/settings/billing
 | 사이트가 안 열림 | Actions 탭의 "사이트 배포" 실행 결과 |
 | 글이 이상함 | `pipeline/generate.mjs`의 SYSTEM 프롬프트 수정 |
 
-## 아직 안 한 것
+## 아직 안 한 것 (내가 직접 해야 함)
 
-- [ ] `site/privacy.html` 8번 항목의 이메일 주소 채우기
-- [ ] 글 20편 이상 쌓은 뒤 Google 애드센스 신청
+짧은 것부터. 급한 건 없습니다.
+
+- [ ] **네이버 웹페이지 수집 요청** — searchadvisor.naver.com → 요청 → 웹 페이지 수집
+      `https://qi777xt0925-hue.github.io/posts/sadae-boheom-yoyul-2026.html`
+      (사이트 등록·소유확인·사이트맵 제출은 완료됨)
+- [ ] **Bing 웹마스터 등록** (5분, 무료) — bing.com/webmasters
+      Search Console에서 가져오기 기능이 있어 클릭 몇 번이면 끝납니다.
+      점유율은 낮지만 ChatGPT·코파일럿 검색이 Bing 색인을 씁니다.
+- [ ] **`site/privacy.html` 8번 항목의 이메일 주소** 채우기
+      학교 메일 말고 개인 메일 권장. 애드센스 신청 전까지만 하면 됩니다.
+- [ ] **글 20편 이상** 쌓은 뒤 Google 애드센스 신청 ← 가장 오래 걸림
 - [ ] 애드센스 승인되면 광고 코드를 `<div class="ad">` 자리에 삽입
+
+## 새 글이 나올 때마다 하면 좋은 것
+
+- **구글**: Search Console → URL 검사 → 주소 입력 → **색인 생성 요청**
+- **네이버**: 서치어드바이저 → 요청 → **웹 페이지 수집**
+
+둘 다 "이 글 지금 가져가라"는 직접 요청입니다. 안 해도 사이트맵으로 언젠가 잡히지만, 하면 며칠 빨라집니다.
