@@ -39,7 +39,7 @@ const OUT_DIR = DRAFT ? path.join(ROOT, 'site', '_drafts') : path.join(ROOT, 'si
 const ARTICLE_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['title', 'h1', 'description', 'lead', 'sections', 'faq'],
+  required: ['title', 'h1', 'description', 'lead', 'sections', 'faq', 'sources'],
   properties: {
     title: { type: 'string', description: '<title> 태그용. 사이트명 제외 45자 이내.' },
     h1: { type: 'string', description: '본문 대제목. title과 달라도 됨.' },
@@ -77,6 +77,20 @@ const ARTICLE_SCHEMA = {
         properties: { q: { type: 'string' }, a: { type: 'string' } },
       },
     },
+    sources: {
+      type: 'array',
+      description:
+        '본문의 근거가 된 공식 자료 2~4개. 국민연금공단·국세청·고용노동부·법제처 같은 1차 출처를 우선하고, 실제로 확인한 것만 넣으세요. 확인하지 못했으면 빈 배열.',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['name', 'url'],
+        properties: {
+          name: { type: 'string', description: '자료 이름. 예: 국민연금공단 - 연금보험료 안내' },
+          url: { type: 'string', description: '실제로 접근 가능한 URL' },
+        },
+      },
+    },
   },
 };
 
@@ -90,6 +104,7 @@ const SYSTEM = `당신은 한국 생활 금융 정보 사이트의 필자입니�
 - 독자를 "여러분"이라고 부르지 말고, 필요하면 그냥 주어를 생략하세요.
 - 과장하거나 단정하지 마세요. 예외가 있는 규칙은 예외가 있다고 쓰세요.
 - 세무·법률 판단이 필요한 대목에서는 전문가 상담이 필요하다고 명시하세요.
+- sources에는 본문 근거가 된 공식 자료만 넣으세요. 검색으로 실제 확인한 URL만 쓰고, 기억에 의존해 주소를 지어내지 마세요. 확인하지 못했다면 빈 배열로 두는 편이 낫습니다.
 
 분량: 섹션 4~7개, 전체 1,500~2,500자 정도. 채우기 위한 문단을 넣지 마세요.`;
 
@@ -203,7 +218,8 @@ for (const topic of queue) {
     continue;
   }
 
-  const html = renderPost(article, topic, config, today);
+  const others = topics.filter((t) => t.published && t.slug !== topic.slug);
+  const html = renderPost(article, topic, config, today, others);
   const outFile = path.join(OUT_DIR, `${topic.slug}.html`);
   fs.writeFileSync(outFile, html, 'utf8');
   console.log(`  ✓ ${path.relative(ROOT, outFile)}`);
