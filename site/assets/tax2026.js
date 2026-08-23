@@ -61,6 +61,15 @@ function earnedIncomeTaxCredit(calcTax, gross){
 }
 
 /**
+ * 10원 미만 절사. 4대보험료는 모두 이 방식으로 원 단위를 버린다.
+ * 곱셈 결과가 부동소수점 오차로 19,500 대신 19,499.999...가 되는 것을 막기 위해
+ * 소수점 6자리에서 한 번 정리한 뒤 절사한다.
+ */
+function floor10(n){
+  return Math.floor(Math.round(n * 1e6) / 1e6 / 10) * 10;
+}
+
+/**
  * 월 실수령액 계산
  * @param {number} annual        계약 연봉 (원)
  * @param {number} taxFreeMonth  월 비과세액 (식대 등, 원)
@@ -71,17 +80,22 @@ function calcNetPay(annual, taxFreeMonth, dependents, severanceIncluded){
   // 퇴직금 포함 연봉이면 실제 연간 급여는 연봉 × 12/13
   const paidAnnual = severanceIncluded ? annual * 12 / 13 : annual;
 
-  const grossMonth   = paidAnnual / 12;                       // 월 총지급액
+  // 급여대장은 월 지급액을 10원 단위로 맞춘다 (예: 연봉 2,600만 → 2,166,670원)
+  const grossMonth   = Math.round(paidAnnual / 12 / 10) * 10; // 월 총지급액
   const taxFree      = Math.min(taxFreeMonth, grossMonth);    // 월 비과세
   const taxableMonth = Math.max(grossMonth - taxFree, 0);     // 월 과세소득
   const taxableYear  = taxableMonth * 12;                     // 연 과세급여(총급여)
 
   // ── 4대보험 (월) ──
-  const pensionBase = Math.min(Math.max(taxableMonth, RATES.pension.min), RATES.pension.max);
-  const pension = Math.floor(pensionBase * RATES.pension.worker / 10) * 10;
-  const health  = Math.floor(taxableMonth * RATES.health.worker / 10) * 10;
-  const ltc     = Math.floor(health * RATES.ltc.rate / 10) * 10;
-  const employ  = Math.floor(taxableMonth * RATES.employ.worker / 10) * 10;
+  // 국민연금 기준소득월액은 천원 미만을 절사한 뒤 요율을 곱한다
+  const pensionBase = Math.min(
+    Math.max(Math.floor(taxableMonth / 1000) * 1000, RATES.pension.min),
+    RATES.pension.max
+  );
+  const pension = floor10(pensionBase * RATES.pension.worker);
+  const health  = floor10(taxableMonth * RATES.health.worker);
+  const ltc     = floor10(health * RATES.ltc.rate);
+  const employ  = floor10(taxableMonth * RATES.employ.worker);
 
   // ── 소득세 (연간 정식 계산 후 ÷12) ──
   const eiDeduction   = earnedIncomeDeduction(taxableYear);
