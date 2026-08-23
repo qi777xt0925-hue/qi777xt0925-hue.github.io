@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>퇴직금 계산기 2026 | 예상 퇴직금과 퇴직소득세 - 계산기랩</title>
+<meta name="description" content="입사일과 퇴직일, 월 급여만 넣으면 평균임금 기준 예상 퇴직금과 퇴직소득세를 계산합니다. 2026년 기준 근속연수공제·환산급여공제 반영.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/severance.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="퇴직금 계산기 2026 | 예상 퇴직금과 퇴직소득세">
+<meta property="og:description" content="입사일·퇴직일·월 급여로 평균임금 기준 퇴직금과 세후 실수령액을 확인합니다.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>퇴직금 계산기</h1>
+  <p class="lead">평균임금 기준으로 예상 퇴직금을 계산하고, 퇴직소득세를 뗀 실수령액까지 보여줍니다. 2026년 기준입니다.</p>
+
+  <section class="card">
+    <div class="grid2">
+      <div class="field">
+        <label for="joinDate">입사일</label>
+        <input type="date" id="joinDate" value="2023-03-01">
+      </div>
+      <div class="field">
+        <label for="leaveDate">퇴직일 <span class="hint">마지막 근무일 다음 날</span></label>
+        <input type="date" id="leaveDate" value="2026-03-01">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="pay">월 급여 <span class="hint">세전, 최근 3개월 평균</span></label>
+      <div class="inputrow">
+        <input type="text" id="pay" inputmode="numeric" value="3,000,000">
+        <span class="unit">원</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="bonus">연간 상여금 <span class="hint">없으면 0</span></label>
+        <div class="inputrow">
+          <input type="text" id="bonus" inputmode="numeric" value="0">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="leavePay">연간 연차수당 <span class="hint">없으면 0</span></label>
+        <div class="inputrow">
+          <input type="text" id="leavePay" inputmode="numeric" value="0">
+          <span class="unit">원</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap">예상 퇴직금 (세전)</div>
+    <div class="big" id="amount">–</div>
+    <div class="sub" id="sub">–</div>
+    <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>계산 내역</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>재직일수</th><td id="r-days">–</td></tr>
+        <tr><th>ㄴ 근속연수 <span class="hint">세금 계산용 · 1년 미만은 올림</span></th><td id="r-years">–</td></tr>
+        <tr><th>평균임금 산정기간</th><td id="r-period">–</td></tr>
+        <tr><th>1일 평균임금</th><td id="r-daily">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">퇴직금</th><td style="padding-top:18px" id="r-amount">–</td></tr>
+        <tr class="neg"><th>퇴직소득세</th><td id="r-tax">–</td></tr>
+        <tr class="neg"><th>지방소득세 (소득세의 10%)</th><td id="r-local">–</td></tr>
+        <tr class="tot"><th>세후 실수령액</th><td id="r-net">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    퇴직소득세 실효세율은 <strong id="r-rate">–</strong>입니다. 퇴직소득세는 근속연수가 길수록 공제가 커져 세율이 낮아집니다.
+  </div>
+
+  <h2>근속연수별 퇴직금</h2>
+  <p class="lead" style="margin-bottom:12px">현재 입력한 월 급여 기준입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>근속</th><th>퇴직금</th><th>퇴직소득세</th><th>세후 실수령</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>퇴직금은 이렇게 계산됩니다</h2>
+  <p>퇴직금은 근속 1년당 <strong>30일치 평균임금</strong>입니다. 계속근로기간이 1년 이상이고 주 소정근로시간이 15시간 이상이면 발생합니다.</p>
+
+  <h3>1. 1일 평균임금을 구합니다</h3>
+  <p>퇴직일 이전 <strong>3개월간 받은 임금 총액</strong>을 그 기간의 <strong>총일수</strong>로 나눕니다. 총일수는 근무일이 아니라 달력 일수라 보통 89~92일입니다. 연간 상여금과 연차수당이 있으면 각각 3/12만큼을 임금 총액에 더합니다.</p>
+
+  <h3>2. 재직일수를 곱합니다</h3>
+  <p>퇴직금 = 1일 평균임금 × 30 × (재직일수 ÷ 365). 그래서 <strong>1년을 하루라도 못 채우면 0원</strong>이 됩니다.</p>
+
+  <h3>3. 퇴직소득세를 뗍니다</h3>
+  <p>퇴직소득세는 일반 소득세와 계산 방식이 다릅니다. 오래 쌓인 돈을 한 번에 받는 것이라 세 부담을 낮추는 구조가 들어갑니다. 근속연수공제를 빼고, 12배수로 환산해 환산급여공제를 적용한 뒤 세율을 매기고 다시 근속연수로 되돌립니다. 그래서 <strong>같은 금액이라도 오래 다닌 사람이 세금을 덜 냅니다.</strong></p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>퇴직일은 마지막 근무일인가요?</summary>
+    <div class="body">퇴직일은 <strong>마지막으로 근무한 날의 다음 날</strong>입니다. 12월 31일까지 일했다면 퇴직일은 1월 1일입니다. 재직일수는 입사일부터 퇴직일까지의 날수로 셉니다.</div>
+  </details>
+  <details>
+    <summary>1년 미만인데 퇴직금을 못 받나요?</summary>
+    <div class="body">계속근로기간이 1년 미만이면 법정 퇴직금은 발생하지 않습니다. 다만 회사 규정으로 더 주는 경우는 있습니다. 반대로 <strong>1년을 하루만 넘겨도 온전히 발생</strong>하므로, 퇴사일이 1년 경계 근처라면 날짜를 정확히 세어보는 게 좋습니다.</div>
+  </details>
+  <details>
+    <summary>5인 미만 사업장도 받나요?</summary>
+    <div class="body">받습니다. 연장·야간·휴일 가산수당이나 연차휴가는 5인 미만 사업장에 적용되지 않지만, <strong>퇴직금은 사업장 규모와 무관하게 적용</strong>됩니다.</div>
+  </details>
+  <details>
+    <summary>퇴직 직전에 급여가 줄면 어떻게 되나요?</summary>
+    <div class="body">퇴직금은 <strong>퇴직 직전 3개월</strong>의 평균임금으로 정해집니다. 그래서 마지막 3개월에 무급휴직이나 근로시간 단축이 있으면 퇴직금이 함께 줄어듭니다. 다만 이렇게 산정한 평균임금이 통상임금보다 적으면 통상임금을 기준으로 하도록 되어 있으니, 해당된다면 확인해보셔야 합니다.</div>
+  </details>
+  <details>
+    <summary>퇴직연금(DC형)도 같은 금액인가요?</summary>
+    <div class="body">이 계산기는 <strong>퇴직금 제도(DB형에 준하는 법정 최저 기준)</strong>를 기준으로 합니다. DC형은 회사가 매년 연간 임금총액의 1/12 이상을 적립하고 그 운용 성과가 더해지므로, 실제 수령액이 달라집니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    근로자퇴직급여 보장법상 법정 퇴직금(근속 1년당 30일분 평균임금)과 국세청 퇴직소득세 계산 방식(근속연수공제·환산급여공제)을 따릅니다.
+    비과세 퇴직소득, 임원 퇴직금 한도, 퇴직연금 운용수익은 반영하지 않습니다.
+    참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 2026년 기준 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"퇴직금 계산기 2026","applicationCategory":"FinanceApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"입사일과 퇴직일, 월 급여로 평균임금 기준 퇴직금과 퇴직소득세를 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"퇴직일은 마지막 근무일인가요?","acceptedAnswer":{"@type":"Answer","text":"퇴직일은 마지막으로 근무한 날의 다음 날입니다. 12월 31일까지 일했다면 퇴직일은 1월 1일이며, 재직일수는 입사일부터 퇴직일까지의 날수로 셉니다."}},
+{"@type":"Question","name":"1년 미만이면 퇴직금을 받나요?","acceptedAnswer":{"@type":"Answer","text":"계속근로기간이 1년 미만이면 법정 퇴직금은 발생하지 않습니다. 1년을 하루만 넘겨도 온전히 발생합니다."}},
+{"@type":"Question","name":"5인 미만 사업장도 퇴직금을 받나요?","acceptedAnswer":{"@type":"Answer","text":"받습니다. 연장·야간·휴일 가산수당이나 연차휴가와 달리 퇴직금은 사업장 규모와 무관하게 적용됩니다."}}]}
+</script>
+
+<script src="assets/labor2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const joinDate = $('joinDate'), leaveDate = $('leaveDate');
+  const pay = $('pay'), bonus = $('bonus'), leavePay = $('leavePay');
+
+  [[3000000,'월 300만'],[2500000,'월 250만'],[3500000,'월 350만'],[4000000,'월 400만'],[5000000,'월 500만']]
+    .forEach(function(c){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+      b.addEventListener('click', function(){ pay.value = Number(c[0]).toLocaleString('ko-KR'); render(); });
+      $('chips').appendChild(b);
+    });
+
+  function parseDate(el){
+    if (!el.value) return null;
+    const p = el.value.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+
+  function compute(days, periodDays){
+    const monthlyPay = numOf(pay);
+    const s = severancePay({
+      monthlyPay: monthlyPay,
+      days: days,
+      periodDays: periodDays,
+      annualBonus: numOf(bonus),
+      annualLeave: numOf(leavePay)
+    });
+    if (!s.eligible) return { s: s, t: null };
+    return { s: s, t: retirementTax(s.amount, days) };
+  }
+
+  function render(){
+    const join = parseDate(joinDate), leave = parseDate(leaveDate);
+    const warn = $('warn');
+
+    if (!join || !leave || leave <= join){
+      $('amount').textContent = '–';
+      $('sub').textContent = '퇴직일이 입사일보다 뒤여야 합니다';
+      warn.style.display = 'none';
+      return;
+    }
+
+    const days = daysBetween(join, leave);
+    const periodDays = averagePeriodDays(leave);
+    const r = compute(days, periodDays);
+
+    $('r-days').textContent = won(days) + '일';
+    $('r-period').textContent = periodDays + '일';
+
+    if (!r.s.eligible){
+      $('amount').textContent = '0원';
+      $('sub').textContent = '계속근로 1년 미만이라 법정 퇴직금이 발생하지 않습니다';
+      warn.style.display = 'block';
+      const left = 365 - days;
+      warn.innerHTML = '<strong>1년까지 ' + won(left) + '일 남았습니다.</strong> ' +
+        (left === 1 ? '하루만' : won(left) + '일만') + ' 더 채우면 ' + won(compute(365, periodDays).s.amount) +
+        '원이 발생합니다. 퇴사일을 조정할 수 있다면 확인해보세요.';
+      ['r-years','r-daily','r-amount','r-tax','r-local','r-net'].forEach(function(id){ $(id).textContent = '–'; });
+      $('r-rate').textContent = '–';
+      $('cmp').innerHTML = '';
+      return;
+    }
+
+    const s = r.s, t = r.t;
+    $('amount').textContent = won(s.amount) + '원';
+    $('sub').textContent = '근속 ' + (s.days / 365).toFixed(1) + '년 · 세후 ' + won(t.net) + '원';
+
+    $('r-years').textContent = t.years + '년';
+    $('r-daily').textContent = won(s.dailyAverage) + '원';
+    $('r-amount').textContent = won(s.amount) + '원';
+    $('r-tax').textContent = '-' + won(t.incomeTax) + '원';
+    $('r-local').textContent = '-' + won(t.localTax) + '원';
+    $('r-net').textContent = won(t.net) + '원';
+    $('r-rate').textContent = (t.effectiveRate * 100).toFixed(2) + '%';
+
+    // 통상임금 비교는 여기서 하지 않습니다.
+    // 통상일급(월급÷209×8)은 8시간분 임금이고 평균일급은 달력 일수로 나눈 값이라
+    // 월급제 근로자는 늘 통상일급이 높게 나옵니다. 경고로 띄우면 모든 사용자에게 뜨는
+    // 소음이 되고, 입력이 월 급여 하나뿐이라 실제로 평균임금이 깎였는지도 알 수 없습니다.
+    // 해당되는 경우는 FAQ에서 안내합니다.
+    warn.style.display = 'none';
+
+    const rows = [1, 2, 3, 5, 10, 20].map(function(y){
+      const d = Math.round(y * 365);
+      const c = compute(d, periodDays);
+      const hi = Math.abs(d - days) < 183 ? ' class="hi"' : '';
+      return '<tr' + hi + '><td>' + y + '년</td><td>' + won(c.s.amount) + '</td><td>' +
+        won(c.t.total) + '</td><td>' + won(c.t.net) + '</td></tr>';
+    });
+    $('cmp').innerHTML = rows.join('');
+  }
+
+  attachComma(pay, render);
+  attachComma(bonus, render);
+  attachComma(leavePay, render);
+  joinDate.addEventListener('change', render);
+  leaveDate.addEventListener('change', render);
+  render();
+})();
+</script>
+</body>
+</html>

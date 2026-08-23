@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시급·주휴수당 계산기 2026 | 주휴수당 포함 급여 - 계산기랩</title>
+<meta name="description" content="시급과 주 근로시간만 넣으면 주휴수당과 주휴수당 포함 월급이 바로 나옵니다. 2026년 최저시급 10,320원 기준 미달 여부도 함께 확인합니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/hourly.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="시급·주휴수당 계산기 2026 | 주휴수당 포함 급여">
+<meta property="og:description" content="주 15시간을 넘으면 받는 주휴수당, 얼마인지 바로 확인하세요. 2026년 최저임금 미달 여부도 함께 봅니다.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>시급 · 주휴수당 계산기</h1>
+  <p class="lead">주 소정근로시간이 15시간을 넘으면 주휴수당이 발생합니다. 시급과 근로시간만 넣으면 얼마인지 바로 나옵니다.</p>
+
+  <section class="card">
+    <div class="field">
+      <label for="wage">시급</label>
+      <div class="inputrow">
+        <input type="text" id="wage" inputmode="numeric" value="10,320">
+        <span class="unit">원</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="field">
+      <label for="hours">1주 소정근로시간 <span class="hint">계약서에 적힌 시간</span></label>
+      <div class="inputrow">
+        <input type="number" id="hours" inputmode="decimal" value="20" min="0" max="68" step="0.5"
+               style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+        <span class="unit">시간</span>
+      </div>
+      <div class="chips" id="hourChips"></div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap">주휴수당 (월)</div>
+    <div class="big" id="holiday">–</div>
+    <div class="sub" id="sub">–</div>
+    <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>급여 내역</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>주급</th><td id="r-week">–</td></tr>
+        <tr><th>ㄴ 일한 시간분</th><td id="r-weekwork">–</td></tr>
+        <tr><th>ㄴ 주휴수당</th><td id="r-weekhol">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">월급 <span class="hint">월 4.345주 환산</span></th><td style="padding-top:18px" id="r-month">–</td></tr>
+        <tr><th>ㄴ 일한 시간분</th><td id="r-monthwork">–</td></tr>
+        <tr><th>ㄴ 주휴수당</th><td id="r-monthhol">–</td></tr>
+        <tr class="tot"><th>연 환산</th><td id="r-year">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    2026년 최저시급은 <strong>10,320원</strong>입니다. 주 40시간 기준 월 환산액은 주휴수당을 포함해 <strong>2,156,880원</strong>(209시간)입니다.
+  </div>
+
+  <h2>근로시간별 주휴수당</h2>
+  <p class="lead" style="margin-bottom:12px">현재 입력한 시급 기준입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>주 근로시간</th><th>주휴수당(주)</th><th>주휴수당(월)</th><th>월급 합계</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>주휴수당은 이렇게 계산됩니다</h2>
+  <p>주휴수당은 <strong>일하지 않은 하루치 임금</strong>입니다. 1주 소정근로시간이 15시간 이상이고 그 주의 소정근로일을 개근하면 발생합니다.</p>
+
+  <h3>계산식</h3>
+  <p>주휴수당 = (1주 소정근로시간 ÷ 40) × 8 × 시급. 주 40시간을 넘는 부분은 산정에 넣지 않으므로, 주 40시간과 주 50시간의 주휴수당은 같습니다.</p>
+
+  <h3>15시간이 갈림길입니다</h3>
+  <p>주 14시간이면 주휴수당이 <strong>한 푼도 발생하지 않습니다</strong>. 한 시간 차이로 연 단위 금액이 통째로 갈리기 때문에, 계약서에 주 14시간으로 적혀 있는 경우가 있습니다. 다만 기준은 계약서 숫자가 아니라 <strong>실제 소정근로시간</strong>이므로, 실제로 15시간 이상 일했다면 청구할 수 있습니다.</p>
+
+  <h3>월급쟁이도 이미 받고 있습니다</h3>
+  <p>월급을 시급으로 환산할 때 174가 아니라 <strong>209로 나누는 이유</strong>가 주휴수당입니다. 주 40시간이면 실제 근로가 월 174시간인데, 여기에 주휴 35시간이 더해져 209시간이 됩니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>명세서에 주휴수당 항목이 없어요</summary>
+    <div class="body">기본급에 포함해서 지급하는 경우가 많습니다. 이 계산기로 나온 <strong>월급 합계</strong>와 실제 받은 금액을 비교해보세요. 실제 금액이 더 적다면 주휴수당이 빠졌을 가능성이 있습니다.</div>
+  </details>
+  <details>
+    <summary>결근하면 못 받나요?</summary>
+    <div class="body">그 주의 소정근로일을 <strong>개근</strong>해야 발생합니다. 결근한 주는 주휴수당이 나오지 않습니다. 다만 지각이나 조퇴는 결근이 아니므로 주휴수당에 영향을 주지 않습니다.</div>
+  </details>
+  <details>
+    <summary>5인 미만 사업장도 받나요?</summary>
+    <div class="body">받습니다. 연장·야간·휴일 가산수당은 5인 미만 사업장에 적용되지 않지만, <strong>주휴수당과 최저임금은 규모와 무관하게 적용</strong>됩니다.</div>
+  </details>
+  <details>
+    <summary>주 40시간을 넘게 일하면 주휴수당도 늘어나나요?</summary>
+    <div class="body">늘어나지 않습니다. 주휴수당 산정은 주 40시간이 상한입니다. 대신 40시간을 넘는 부분은 <strong>연장근로수당(1.5배)</strong>으로 따로 받아야 합니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    근로기준법상 주휴수당(1주 소정근로시간 15시간 이상, 소정근로일 개근)과 2026년 최저임금 10,320원을 기준으로 합니다.
+    월 환산은 월 4.345주로 계산하며, 연장·야간·휴일 가산수당은 포함하지 않습니다.
+    최저임금 산입 범위(상여금·복리후생비 일부 포함)는 반영하지 않았으므로, 미달 판단은 참고용으로만 보시기 바랍니다.
+    참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 2026년 기준 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"시급·주휴수당 계산기 2026","applicationCategory":"FinanceApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"시급과 주 소정근로시간으로 주휴수당과 주휴수당 포함 급여를 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"주휴수당은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"주휴수당은 (1주 소정근로시간 ÷ 40) × 8 × 시급으로 계산합니다. 1주 소정근로시간이 15시간 이상이고 소정근로일을 개근해야 발생하며, 주 40시간을 넘는 부분은 산정에 넣지 않습니다."}},
+{"@type":"Question","name":"주 14시간이면 주휴수당을 받나요?","acceptedAnswer":{"@type":"Answer","text":"받지 못합니다. 1주 소정근로시간이 15시간 미만이면 주휴수당이 발생하지 않습니다. 다만 기준은 계약서 숫자가 아니라 실제 소정근로시간입니다."}},
+{"@type":"Question","name":"2026년 최저시급은 얼마인가요?","acceptedAnswer":{"@type":"Answer","text":"2026년 최저시급은 10,320원이며, 주 40시간 기준 월 환산액은 주휴수당을 포함해 2,156,880원(209시간)입니다."}}]}
+</script>
+
+<script src="assets/labor2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const wage = $('wage'), hours = $('hours');
+
+  [[10320,'최저시급'],[11000,'1.1만'],[12000,'1.2만'],[15000,'1.5만'],[20000,'2만']]
+    .forEach(function(c){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+      b.addEventListener('click', function(){ wage.value = Number(c[0]).toLocaleString('ko-KR'); render(); });
+      $('chips').appendChild(b);
+    });
+
+  [15, 20, 25, 30, 40].forEach(function(h){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = '주 ' + h + '시간';
+    b.addEventListener('click', function(){ hours.value = h; render(); });
+    $('hourChips').appendChild(b);
+  });
+
+  function render(){
+    const w = numOf(wage);
+    const h = Number(hours.value) || 0;
+    const r = wageWithHoliday(h, w);
+    const warn = $('warn');
+
+    if (!r.holiday.eligible){
+      $('holiday').textContent = '0원';
+      $('sub').textContent = r.holiday.reason;
+      warn.style.display = 'block';
+      warn.innerHTML = '<strong>주 15시간을 넘기면 주휴수당이 발생합니다.</strong> 지금 조건에서 한 시간만 늘려도 월 ' +
+        won(weeklyHolidayPay(15, w).monthly) + '원이 생깁니다. 계약서 시간이 아니라 <strong>실제 일한 시간</strong>이 기준입니다.';
+    } else {
+      $('holiday').textContent = won(r.holiday.monthly) + '원';
+      $('sub').textContent = '주 ' + won(r.holiday.weekly) + '원 · 연 ' + won(r.holiday.yearly) + '원';
+      warn.style.display = 'none';
+    }
+
+    if (r.belowMinWage){
+      warn.style.display = 'block';
+      warn.innerHTML = '<strong>입력한 시급이 2026년 최저시급(10,320원)보다 낮습니다.</strong> ' +
+        '다만 최저임금 산입 범위에 상여금·복리후생비 일부가 들어가므로, 기본급만으로 판단하면 결과가 달라질 수 있습니다.';
+    }
+
+    $('r-week').textContent = won(r.totalWeekly) + '원';
+    $('r-weekwork').textContent = won(r.workWeekly) + '원';
+    $('r-weekhol').textContent = won(r.holiday.weekly) + '원';
+    $('r-month').textContent = won(r.totalMonthly) + '원';
+    $('r-monthwork').textContent = won(r.workMonthly) + '원';
+    $('r-monthhol').textContent = won(r.holiday.monthly) + '원';
+    $('r-year').textContent = won(r.totalMonthly * 12) + '원';
+
+    const rows = [14, 15, 20, 25, 30, 35, 40].map(function(x){
+      const c = wageWithHoliday(x, w);
+      const hi = Math.abs(x - h) < 0.5 ? ' class="hi"' : '';
+      return '<tr' + hi + '><td>' + x + '시간</td><td>' + won(c.holiday.weekly) + '</td><td>' +
+        won(c.holiday.monthly) + '</td><td>' + won(c.totalMonthly) + '</td></tr>';
+    });
+    $('cmp').innerHTML = rows.join('');
+  }
+
+  attachComma(wage, render);
+  hours.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>
