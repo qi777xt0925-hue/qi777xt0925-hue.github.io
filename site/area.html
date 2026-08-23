@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>평수 ↔ 제곱미터 변환 | 부동산 면적 계산기 - 계산기랩</title>
+<meta name="description" content="평과 제곱미터를 즉시 변환합니다. 1평은 3.3058㎡. 84㎡가 몇 평인지, 전용면적과 공급면적 차이까지 함께 정리했습니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/area.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="평수 ↔ 제곱미터 변환 | 부동산 면적 계산기">
+<meta property="og:description" content="84㎡는 몇 평일까요? 평과 제곱미터를 바로 변환합니다.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>평수 ↔ 제곱미터 변환</h1>
+  <p class="lead">부동산 매물은 제곱미터로 표기되지만 대화는 평으로 합니다. 양쪽을 바로 바꿔봅니다.</p>
+
+  <section class="card">
+    <div class="grid2">
+      <div class="field">
+        <label for="pyeong">평</label>
+        <div class="inputrow">
+          <input type="number" id="pyeong" inputmode="decimal" value="25" min="0" step="0.1"
+                 style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+          <span class="unit">평</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="m2">제곱미터</label>
+        <div class="inputrow">
+          <input type="number" id="m2" inputmode="decimal" value="82.6" min="0" step="0.1"
+                 style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+          <span class="unit">㎡</span>
+        </div>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap">변환 결과</div>
+    <div class="big" id="out">–</div>
+    <div class="sub" id="sub">1평 = 3.3058㎡</div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>자주 쓰는 면적</h2>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>제곱미터</th><th>평</th><th>보통 이렇게 부릅니다</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <h2>평과 제곱미터</h2>
+  <p>1평은 <strong>3.3058㎡</strong>입니다. 사방 6자(약 1.818m)인 정사각형의 넓이에서 온 단위라 딱 떨어지지 않습니다.</p>
+  <p>2007년부터 부동산 공식 표기는 제곱미터로 통일됐지만, 현장에서는 여전히 평으로 이야기합니다. 매물을 볼 때는 <strong>제곱미터를 3.3으로 나누면</strong> 대략의 평수가 나옵니다.</p>
+
+  <h3>전용면적과 공급면적은 다릅니다</h3>
+  <p>흔히 말하는 "34평 아파트"의 전용면적은 <strong>84㎡(약 25.4평)</strong>입니다. 숫자가 다른 이유는 기준이 다르기 때문입니다.</p>
+  <ul>
+    <li><strong>전용면적</strong> — 현관문 안쪽, 실제로 쓰는 공간입니다. 매물에 84㎡로 적히는 그 면적입니다.</li>
+    <li><strong>공급면적</strong> — 전용면적에 계단·복도 같은 주거공용면적을 더한 것입니다. "34평"은 보통 이 기준입니다.</li>
+    <li><strong>계약면적</strong> — 공급면적에 주차장·관리사무소 등 기타공용면적까지 더합니다.</li>
+  </ul>
+  <p>그래서 <strong>같은 집을 두고 25평이라고도 하고 34평이라고도 합니다.</strong> 어느 면적을 말하는지 확인하는 게 먼저입니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>84㎡는 몇 평인가요?</summary>
+    <div class="body">전용면적 기준으로 <strong>약 25.4평</strong>입니다. 다만 공용면적을 더한 공급면적으로는 보통 33~34평이라 부릅니다. 흔히 말하는 "국민평형 34평"이 이 집입니다.</div>
+  </details>
+  <details>
+    <summary>3.3으로 나눠도 되나요?</summary>
+    <div class="body">대략적인 감을 잡는 데는 충분합니다. 정확한 값은 3.3058이라 <strong>100㎡ 기준으로 0.2평 정도</strong> 차이가 납니다. 계약서에 쓸 숫자라면 정확한 값을 쓰세요.</div>
+  </details>
+  <details>
+    <summary>왜 3.3058이라는 애매한 숫자인가요?</summary>
+    <div class="body">1평은 사방 6자인 정사각형입니다. 1자가 10/33m이므로 6자는 60/33m이고, 이를 제곱하면 3600/1089 = <strong>400/121 ≈ 3.3058㎡</strong>가 됩니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    1평 = 400/121㎡ ≈ 3.305785㎡로 계산합니다.
+    전용면적·공급면적·계약면적은 기준이 다르므로, 매물 정보에서 어느 면적인지 확인하시기 바랍니다.
+    참고용 자료입니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"평수 제곱미터 변환기","applicationCategory":"UtilitiesApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"평과 제곱미터를 서로 변환합니다. 1평은 3.3058제곱미터입니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"84제곱미터는 몇 평인가요?","acceptedAnswer":{"@type":"Answer","text":"전용면적 기준으로 약 25.4평입니다. 공용면적을 더한 공급면적으로는 보통 33~34평이라 부릅니다."}},
+{"@type":"Question","name":"1평은 몇 제곱미터인가요?","acceptedAnswer":{"@type":"Answer","text":"1평은 400/121제곱미터, 약 3.3058제곱미터입니다. 사방 6자인 정사각형의 넓이에서 온 단위입니다."}},
+{"@type":"Question","name":"전용면적과 공급면적의 차이는?","acceptedAnswer":{"@type":"Answer","text":"전용면적은 현관문 안쪽 실제 사용 공간이고, 공급면적은 여기에 계단·복도 같은 주거공용면적을 더한 것입니다. 같은 집을 25평이라고도, 34평이라고도 부르는 이유입니다."}}]}
+</script>
+
+<script src="assets/finance2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const pyeong = $('pyeong'), m2 = $('m2');
+  let last = 'pyeong';
+
+  const round1 = n => Math.round(n * 10) / 10;
+  const round2 = n => Math.round(n * 100) / 100;
+
+  [[59,'59㎡'],[84,'84㎡'],[114,'114㎡'],[20,'20평'],[34,'34평']].forEach(function(c){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+    b.addEventListener('click', function(){
+      if (c[1].indexOf('㎡') >= 0){ m2.value = c[0]; last = 'm2'; } else { pyeong.value = c[0]; last = 'pyeong'; }
+      render();
+    });
+    $('chips').appendChild(b);
+  });
+
+  function render(){
+    if (last === 'pyeong'){
+      const p = Number(pyeong.value) || 0;
+      const v = pyeongToM2(p);
+      m2.value = round2(v);
+      $('out').textContent = round1(p) + '평 = ' + round2(v) + '㎡';
+    } else {
+      const v = Number(m2.value) || 0;
+      const p = m2ToPyeong(v);
+      pyeong.value = round2(p);
+      $('out').textContent = round2(v) + '㎡ = ' + round1(p) + '평';
+    }
+
+    $('cmp').innerHTML = [
+      [39, '원룸·오피스텔'],
+      [49, '소형 아파트'],
+      [59, '국민주택 소형 (24평)'],
+      [74, '중소형'],
+      [84, '국민평형 (34평)'],
+      [101, '중형'],
+      [114, '중대형 (45평)'],
+      [134, '대형']
+    ].map(function(r){
+      return '<tr><td>' + r[0] + '㎡</td><td>' + round1(m2ToPyeong(r[0])) + '평</td><td>' + r[1] + '</td></tr>';
+    }).join('');
+  }
+
+  pyeong.addEventListener('input', function(){ last = 'pyeong'; render(); });
+  m2.addEventListener('input', function(){ last = 'm2'; render(); });
+  render();
+})();
+</script>
+</body>
+</html>

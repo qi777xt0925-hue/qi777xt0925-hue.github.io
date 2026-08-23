@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>전월세 전환율 계산기 2026 | 전세↔월세 환산과 법정 상한 - 계산기랩</title>
+<meta name="description" content="전세를 월세로, 월세를 전세로 바꾸면 얼마인지 계산합니다. 2026년 법정 전환율 상한 4.5%(기준금리 2.5% + 2%)와 비교해 손해 여부까지 확인합니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/rent.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="전월세 전환율 계산기 2026 | 전세↔월세 환산">
+<meta property="og:description" content="지금 제안받은 조건의 전환율이 법정 상한을 넘는지 바로 확인하세요.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>전월세 전환율 계산기</h1>
+  <p class="lead">전세를 월세로 돌리자는 제안을 받았을 때, 그 조건이 적절한지 확인합니다. 2026년 법정 상한은 연 4.5%입니다.</p>
+
+  <section class="card">
+    <div class="field">
+      <label>계산 방향</label>
+      <div class="seg" id="dir">
+        <button type="button" data-v="toMonthly" aria-pressed="true">전세 → 월세</button>
+        <button type="button" data-v="toJeonse" aria-pressed="false">월세 → 전세</button>
+        <button type="button" data-v="check" aria-pressed="false">전환율 확인</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="jeonse">전세 보증금</label>
+      <div class="inputrow">
+        <input type="text" id="jeonse" inputmode="numeric" value="500,000,000">
+        <span class="unit">원</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="field">
+      <label for="deposit">월세 보증금 <span class="hint">전환 후 남길 보증금</span></label>
+      <div class="inputrow">
+        <input type="text" id="deposit" inputmode="numeric" value="100,000,000">
+        <span class="unit">원</span>
+      </div>
+    </div>
+
+    <div class="field" id="monthlyField" style="display:none">
+      <label for="monthly">월세</label>
+      <div class="inputrow">
+        <input type="text" id="monthly" inputmode="numeric" value="1,500,000">
+        <span class="unit">원</span>
+      </div>
+    </div>
+
+    <div class="field" id="rateField">
+      <label for="rate">전환율 <span class="hint">법정 상한 4.5%</span></label>
+      <div class="inputrow">
+        <input type="number" id="rate" inputmode="decimal" value="4.5" min="0" max="20" step="0.1"
+               style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+        <span class="unit">%</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap" id="cap">환산 월세</div>
+    <div class="big" id="out">–</div>
+    <div class="sub" id="sub">–</div>
+    <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>계산 내역</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>전세 보증금</th><td id="r-jeonse">–</td></tr>
+        <tr><th>월세 보증금</th><td id="r-deposit">–</td></tr>
+        <tr><th>전환 대상 금액</th><td id="r-gap">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">적용 전환율</th><td style="padding-top:18px" id="r-rate">–</td></tr>
+        <tr><th>법정 상한</th><td id="r-legal">–</td></tr>
+        <tr class="tot"><th id="r-outlabel">환산 월세</th><td id="r-out">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>전환율별 월세</h2>
+  <p class="lead" style="margin-bottom:12px">현재 입력한 보증금 조건 기준입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>전환율</th><th>월세</th><th>연간 부담</th><th>비고</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>전월세 전환율은 이렇게 계산됩니다</h2>
+  <p>전환율은 <strong>보증금을 월세로 바꿀 때 적용하는 연이율</strong>입니다. 줄어드는 보증금에 전환율을 곱하고 12로 나누면 월세가 나옵니다.</p>
+  <p>월세 = (전세 보증금 − 월세 보증금) × 전환율 ÷ 12</p>
+
+  <h3>법정 상한이 있습니다</h3>
+  <p>주택임대차보호법은 전환율 상한을 <strong>한국은행 기준금리 + 2%</strong>로 정하고 있습니다. 2026년 기준금리가 2.5%이므로 상한은 <strong>연 4.5%</strong>입니다. 기준금리가 바뀌면 상한도 함께 달라지므로, 계약 시점의 기준금리를 확인해야 합니다.</p>
+
+  <h3>다만 모든 계약에 적용되지는 않습니다</h3>
+  <p>이 상한은 <strong>계약 기간 중 전환하거나 계약갱신요구권을 행사할 때</strong> 강제력을 가집니다. <strong>신규 계약에는 적용되지 않습니다.</strong> 새로 구하는 집이라면 상한을 넘는 조건이어도 위법이 아니므로, 시세와 비교해 판단하셔야 합니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>전환율이 높으면 누가 손해인가요?</summary>
+    <div class="body">세입자가 불리합니다. 전환율이 높을수록 <strong>같은 보증금을 줄이는 대가로 더 많은 월세</strong>를 내야 하기 때문입니다. 반대로 전환율이 낮으면 세입자에게 유리합니다.</div>
+  </details>
+  <details>
+    <summary>상한을 넘는 조건을 제안받았습니다</summary>
+    <div class="body">갱신 계약이라면 <strong>초과분은 무효</strong>이며 이미 낸 금액은 반환을 청구할 수 있습니다. 다만 신규 계약에는 상한이 적용되지 않습니다. 다툼이 있으면 각 지자체의 임대차분쟁조정위원회에 조정을 신청할 수 있습니다.</div>
+  </details>
+  <details>
+    <summary>반전세는 어떻게 계산하나요?</summary>
+    <div class="body">반전세도 같은 식입니다. 남길 보증금을 '월세 보증금'에 넣으면 <strong>줄어드는 금액만큼만</strong> 월세로 환산됩니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    주택임대차보호법 제7조의2에 따른 전환율 상한(한국은행 기준금리 + 대통령령 이율 2%)을 기준으로 하며,
+    2026년 기준금리 2.5%를 반영했습니다. 기준금리가 변경되면 상한도 달라집니다.
+    관리비, 중개보수, 세금은 반영하지 않습니다.
+    참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 2026년 기준 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"전월세 전환율 계산기 2026","applicationCategory":"FinanceApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"전세와 월세를 서로 환산하고 법정 전환율 상한과 비교합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"2026년 전월세 전환율 상한은 얼마인가요?","acceptedAnswer":{"@type":"Answer","text":"연 4.5%입니다. 주택임대차보호법은 상한을 한국은행 기준금리에 2%를 더한 값으로 정하고 있으며, 2026년 기준금리는 2.5%입니다."}},
+{"@type":"Question","name":"법정 상한은 모든 계약에 적용되나요?","acceptedAnswer":{"@type":"Answer","text":"아닙니다. 계약 기간 중 전환하거나 계약갱신요구권을 행사할 때만 강제력을 가지며, 신규 계약에는 적용되지 않습니다."}},
+{"@type":"Question","name":"전월세 전환율은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"월세 = (전세 보증금 - 월세 보증금) × 전환율 ÷ 12로 계산합니다."}}]}
+</script>
+
+<script src="assets/finance2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const jeonse = $('jeonse'), deposit = $('deposit'), monthly = $('monthly'), rate = $('rate');
+  let dir = 'toMonthly';
+  const LEGAL = legalConversionRate();
+
+  [[300000000,'3억'],[400000000,'4억'],[500000000,'5억'],[700000000,'7억']].forEach(function(c){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+    b.addEventListener('click', function(){ jeonse.value = Number(c[0]).toLocaleString('ko-KR'); render(); });
+    $('chips').appendChild(b);
+  });
+
+  Array.prototype.forEach.call($('dir').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){
+      dir = btn.getAttribute('data-v');
+      Array.prototype.forEach.call($('dir').querySelectorAll('button'), function(b){
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      $('monthlyField').style.display = (dir === 'toMonthly') ? 'none' : 'block';
+      $('rateField').style.display = (dir === 'check') ? 'none' : 'block';
+      render();
+    });
+  });
+
+  function verdict(r){
+    if (r == null) return '';
+    if (r > LEGAL) return '<strong>법정 상한 ' + LEGAL + '%를 넘습니다.</strong> 갱신 계약이라면 초과분은 무효이며 반환을 청구할 수 있습니다. 다만 신규 계약에는 상한이 적용되지 않습니다.';
+    return '법정 상한 ' + LEGAL + '% 이내입니다.';
+  }
+
+  function render(){
+    const J = numOf(jeonse), D = numOf(deposit), M = numOf(monthly);
+    const R = Number(rate.value) || 0;
+    const warn = $('warn');
+
+    $('r-jeonse').textContent = won(J) + '원';
+    $('r-deposit').textContent = won(D) + '원';
+    $('r-legal').textContent = LEGAL + '% (기준금리 ' + FINANCE.baseRate + '% + ' + FINANCE.rentSpread + '%)';
+
+    let usedRate = R, gap = Math.max(J - D, 0);
+
+    if (dir === 'toMonthly'){
+      if (J <= D){
+        $('out').textContent = '–';
+        $('sub').textContent = '월세 보증금이 전세 보증금보다 적어야 합니다';
+        warn.style.display = 'none';
+        return;
+      }
+      const res = jeonseToMonthly(J, D, R);
+      $('cap').textContent = '환산 월세';
+      $('out').textContent = won(res.monthly) + '원';
+      $('sub').textContent = '보증금 ' + bigWon(res.gap) + '을 월세로 전환';
+      $('r-outlabel').textContent = '환산 월세';
+      $('r-out').textContent = won(res.monthly) + '원';
+      gap = res.gap;
+    } else if (dir === 'toJeonse'){
+      const res = monthlyToJeonse(D, M, R);
+      $('cap').textContent = '전세 환산액';
+      $('out').textContent = bigWon(res.jeonse);
+      $('sub').textContent = '보증금 ' + bigWon(D) + ' + 월세 환산 ' + bigWon(res.converted);
+      $('r-outlabel').textContent = '전세 환산액';
+      $('r-out').textContent = won(res.jeonse) + '원';
+      gap = res.converted;
+    } else {
+      const cur = currentConversionRate(J, D, M);
+      if (cur == null){
+        $('out').textContent = '–';
+        $('sub').textContent = '월세 보증금이 전세 보증금보다 적어야 합니다';
+        warn.style.display = 'none';
+        return;
+      }
+      usedRate = cur;
+      $('cap').textContent = '현재 조건의 전환율';
+      $('out').textContent = cur.toFixed(2) + '%';
+      $('sub').textContent = '전세 ' + bigWon(J) + ' vs 보증금 ' + bigWon(D) + ' + 월세 ' + won(M) + '원';
+      $('r-outlabel').textContent = '현재 전환율';
+      $('r-out').textContent = cur.toFixed(2) + '%';
+    }
+
+    $('r-gap').textContent = won(gap) + '원';
+    $('r-rate').textContent = usedRate.toFixed(2) + '%';
+
+    warn.style.display = 'block';
+    warn.innerHTML = verdict(usedRate);
+
+    const gapForTable = Math.max(J - D, 0);
+    $('cmp').innerHTML = [3, 3.5, 4, LEGAL, 5, 6].map(function(x){
+      const m = gapForTable * (x / 100) / 12;
+      const hi = Math.abs(x - usedRate) < 0.05 ? ' class="hi"' : '';
+      const tag = x === LEGAL ? '법정 상한' : (x > LEGAL ? '상한 초과' : '');
+      return '<tr' + hi + '><td>' + x + '%</td><td>' + won(m) + '</td><td>' + won(m * 12) + '</td><td>' + tag + '</td></tr>';
+    }).join('');
+  }
+
+  [jeonse, deposit, monthly].forEach(function(el){ attachComma(el, render); });
+  rate.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

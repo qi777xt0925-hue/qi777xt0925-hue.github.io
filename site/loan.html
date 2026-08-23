@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>대출 이자 계산기 | 원리금균등·원금균등 월 납입액 - 계산기랩</title>
+<meta name="description" content="대출 원금과 금리, 기간을 넣으면 원리금균등·원금균등·만기일시 상환 방식별 월 납입액과 총이자를 비교해서 보여줍니다. 거치기간도 반영합니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/loan.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="대출 이자 계산기 | 상환 방식별 월 납입액과 총이자">
+<meta property="og:description" content="원리금균등·원금균등·만기일시를 한 화면에서 비교합니다. 거치기간 반영.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>대출 이자 계산기</h1>
+  <p class="lead">상환 방식에 따라 월 납입액과 총이자가 꽤 달라집니다. 세 가지를 한 화면에서 비교합니다.</p>
+
+  <section class="card">
+    <div class="field">
+      <label for="principal">대출 원금</label>
+      <div class="inputrow">
+        <input type="text" id="principal" inputmode="numeric" value="300,000,000">
+        <span class="unit">원</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="field">
+      <label>상환 방식</label>
+      <div class="seg" id="kind">
+        <button type="button" data-v="equal" aria-pressed="true">원리금균등</button>
+        <button type="button" data-v="principal" aria-pressed="false">원금균등</button>
+        <button type="button" data-v="bullet" aria-pressed="false">만기일시</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="rate">연이율</label>
+        <div class="inputrow">
+          <input type="number" id="rate" inputmode="decimal" value="4" min="0" max="30" step="0.01"
+                 style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="years">상환 기간</label>
+        <div class="inputrow">
+          <input type="number" id="years" inputmode="numeric" value="30" min="1" max="50" step="1"
+                 style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+          <span class="unit">년</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="grace">거치기간 <span class="hint">이자만 내는 기간, 없으면 0</span></label>
+      <div class="inputrow">
+        <input type="number" id="grace" inputmode="numeric" value="0" min="0" max="120" step="1"
+               style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+        <span class="unit">개월</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap" id="cap">월 납입액</div>
+    <div class="big" id="payment">–</div>
+    <div class="sub" id="sub">–</div>
+    <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
+  </section>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>상환 내역</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>대출 원금</th><td id="r-principal">–</td></tr>
+        <tr class="neg"><th>총 이자</th><td id="r-interest">–</td></tr>
+        <tr class="tot"><th>총 상환액</th><td id="r-total">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">첫 달 납입액</th><td style="padding-top:18px" id="r-first">–</td></tr>
+        <tr><th>마지막 달 납입액</th><td id="r-last">–</td></tr>
+        <tr><th>거치기간 중 월 납입액</th><td id="r-grace">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>상환 방식 비교</h2>
+  <p class="lead" style="margin-bottom:12px">같은 원금·금리·기간일 때입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>방식</th><th>첫 달</th><th>마지막 달</th><th>총이자</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+
+  <h2>연도별 잔액</h2>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>시점</th><th>납입액</th><th>ㄴ 원금</th><th>ㄴ 이자</th><th>잔액</th></tr></thead>
+      <tbody id="sched"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>상환 방식은 이렇게 다릅니다</h2>
+
+  <h3>원리금균등</h3>
+  <p>매달 <strong>같은 금액</strong>을 냅니다. 초반에는 이자 비중이 크고 갈수록 원금 비중이 커집니다. 매달 나가는 돈이 일정해서 계획을 세우기 쉽고, 주택담보대출에서 가장 많이 쓰입니다.</p>
+
+  <h3>원금균등</h3>
+  <p>매달 <strong>같은 원금</strong>에 남은 잔액의 이자를 더해 냅니다. 첫 달이 가장 비싸고 갈수록 줄어듭니다. 원금이 빨리 줄어드는 만큼 <strong>총이자가 가장 적습니다.</strong> 초반 부담을 감당할 수 있다면 이쪽이 유리합니다.</p>
+
+  <h3>만기일시</h3>
+  <p>기간 내내 <strong>이자만</strong> 내다가 만기에 원금을 한 번에 갚습니다. 월 부담이 가장 작지만 원금이 줄지 않으니 <strong>총이자가 압도적으로 많습니다.</strong> 전세자금대출처럼 만기에 목돈이 들어오는 게 확실할 때 씁니다.</p>
+
+  <h3>거치기간</h3>
+  <p>거치기간에는 이자만 냅니다. 그동안 원금이 그대로라 <strong>총이자가 늘어납니다.</strong> 당장 상환 여력이 부족할 때 쓰는 장치이지, 이득을 보는 선택은 아닙니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>중도상환수수료는 반영되나요?</summary>
+    <div class="body">반영하지 않습니다. 중도상환수수료는 보통 <strong>남은 기간에 비례해 줄어드는 방식</strong>이고 상품마다 요율이 달라서, 실제 조건은 약정서를 확인하셔야 합니다.</div>
+  </details>
+  <details>
+    <summary>변동금리는 어떻게 보나요?</summary>
+    <div class="body">이 계산기는 <strong>입력한 금리가 만기까지 유지된다고 가정</strong>합니다. 변동금리라면 금리를 몇 단계로 바꿔 넣어보면서 부담이 얼마나 달라지는지 확인해보세요.</div>
+  </details>
+  <details>
+    <summary>총이자가 원금보다 많게 나오는데 맞나요?</summary>
+    <div class="body">기간이 길고 금리가 높으면 그렇게 됩니다. 예를 들어 연 4%로 30년을 빌리면 원리금균등이라도 총이자가 원금의 70%를 넘습니다. <strong>기간을 줄이면 총이자가 크게 줄어듭니다.</strong> 기간을 바꿔가며 비교해보세요.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    입력한 금리가 만기까지 유지된다고 가정한 단순 계산입니다.
+    중도상환수수료, 인지세, 근저당 설정비, 변동금리 조정, 원금 일부 상환은 반영하지 않습니다.
+    실제 대출 조건은 금융기관 상품설명서를 확인하시기 바랍니다.
+    참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"대출 이자 계산기","applicationCategory":"FinanceApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"원리금균등·원금균등·만기일시 상환 방식별 월 납입액과 총이자를 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"원리금균등과 원금균등의 차이는?","acceptedAnswer":{"@type":"Answer","text":"원리금균등은 매달 같은 금액을 내고, 원금균등은 매달 같은 원금에 잔액 이자를 더해 냅니다. 원금균등은 첫 달 부담이 크지만 원금이 빨리 줄어 총이자가 더 적습니다."}},
+{"@type":"Question","name":"거치기간을 두면 이자가 늘어나나요?","acceptedAnswer":{"@type":"Answer","text":"늘어납니다. 거치기간에는 이자만 내고 원금이 그대로 남아 있어 그만큼 이자가 더 붙습니다."}},
+{"@type":"Question","name":"중도상환수수료도 계산되나요?","acceptedAnswer":{"@type":"Answer","text":"반영하지 않습니다. 중도상환수수료는 남은 기간에 비례해 줄어드는 방식이고 상품마다 요율이 달라 약정서를 확인해야 합니다."}}]}
+</script>
+
+<script src="assets/finance2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const principal = $('principal'), rate = $('rate'), years = $('years'), grace = $('grace');
+  let kind = 'equal';
+
+  const KIND_LABEL = { equal:'원리금균등', principal:'원금균등', bullet:'만기일시' };
+
+  [[100000000,'1억'],[200000000,'2억'],[300000000,'3억'],[500000000,'5억']].forEach(function(c){
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+    b.addEventListener('click', function(){ principal.value = Number(c[0]).toLocaleString('ko-KR'); render(); });
+    $('chips').appendChild(b);
+  });
+
+  Array.prototype.forEach.call($('kind').querySelectorAll('button'), function(btn){
+    btn.addEventListener('click', function(){
+      kind = btn.getAttribute('data-v');
+      Array.prototype.forEach.call($('kind').querySelectorAll('button'), function(b){
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      render();
+    });
+  });
+
+  function render(){
+    const P = numOf(principal);
+    const R = Number(rate.value) || 0;
+    const N = Math.max(Number(years.value) || 1, 1) * 12;
+    const G = Math.max(Number(grace.value) || 0, 0);
+    const warn = $('warn');
+
+    if (P <= 0){
+      $('payment').textContent = '–';
+      $('sub').textContent = '대출 원금을 입력하세요';
+      return;
+    }
+    if (G >= N){
+      $('payment').textContent = '–';
+      $('sub').textContent = '거치기간이 상환 기간보다 짧아야 합니다';
+      warn.style.display = 'none';
+      return;
+    }
+
+    const s = loanSchedule(P, R, N, kind, G);
+
+    if (kind === 'equal'){
+      $('cap').textContent = '월 납입액';
+      $('payment').textContent = won(s.equalPayment) + '원';
+      $('sub').textContent = '총이자 ' + bigWon(s.totalInterest) + ' · 총상환 ' + bigWon(s.totalPayment);
+    } else if (kind === 'principal'){
+      $('cap').textContent = '첫 달 납입액';
+      $('payment').textContent = won(s.firstPayment) + '원';
+      $('sub').textContent = '마지막 달 ' + won(s.lastPayment) + '원 · 총이자 ' + bigWon(s.totalInterest);
+    } else {
+      $('cap').textContent = '월 이자';
+      $('payment').textContent = won(s.firstPayment) + '원';
+      $('sub').textContent = '만기에 원금 ' + bigWon(P) + ' 일시상환 · 총이자 ' + bigWon(s.totalInterest);
+    }
+
+    $('r-principal').textContent = won(P) + '원';
+    $('r-interest').textContent = '+' + won(s.totalInterest) + '원';
+    $('r-total').textContent = won(s.totalPayment) + '원';
+    $('r-first').textContent = won(s.firstPayment) + '원';
+    $('r-last').textContent = won(s.lastPayment) + '원';
+    $('r-grace').textContent = G > 0 ? won(s.gracepayment) + '원 (' + G + '개월)' : '없음';
+
+    if (G > 0){
+      const noGrace = loanSchedule(P, R, N, kind, 0);
+      warn.style.display = 'block';
+      warn.innerHTML = '거치 ' + G + '개월 때문에 이자가 <strong>' + won(s.totalInterest - noGrace.totalInterest) +
+        '원</strong> 늘었습니다. 거치기간에는 원금이 줄지 않기 때문입니다.';
+    } else {
+      warn.style.display = 'none';
+    }
+
+    $('cmp').innerHTML = ['equal','principal','bullet'].map(function(k){
+      const c = loanSchedule(P, R, N, k, G);
+      const hi = k === kind ? ' class="hi"' : '';
+      return '<tr' + hi + '><td>' + KIND_LABEL[k] + '</td><td>' + won(c.firstPayment) + '</td><td>' +
+        won(c.lastPayment) + '</td><td>' + won(c.totalInterest) + '</td></tr>';
+    }).join('');
+
+    // 1년 간격으로 훑되 마지막 달은 반드시 포함합니다
+    const picks = [];
+    for (let i = 11; i < s.rows.length; i += 12) picks.push(i);
+    if (picks[picks.length - 1] !== s.rows.length - 1) picks.push(s.rows.length - 1);
+    $('sched').innerHTML = picks.map(function(i){
+      const row = s.rows[i];
+      return '<tr><td>' + Math.round((row.no) / 12 * 10) / 10 + '년</td><td>' + won(row.payment) + '</td><td>' +
+        won(row.principal) + '</td><td>' + won(row.interest) + '</td><td>' + won(row.balance) + '</td></tr>';
+    }).join('');
+  }
+
+  attachComma(principal, render);
+  [rate, years, grace].forEach(function(el){ el.addEventListener('input', render); });
+  render();
+})();
+</script>
+</body>
+</html>
