@@ -2,6 +2,16 @@ name: 가이드 글 생성
 
 # 매주 금요일 오전 9시(KST)에 한 편 생성해 Pull Request로 올립니다.
 # 검토 후 머지하면 pages.yml이 배포합니다.
+#
+# 글 생성은 Anthropic API를 호출하므로 실행할 때마다 비용이 듭니다(1편당 약 $0.35).
+# 그래서 이 워크플로는 두 가지를 지킵니다.
+#   1) 돈을 쓰기 전에 먼저 점검한다 (API 키·요청 편수·큐 상태)
+#   2) 돈을 쓴 뒤에는 결과물을 잃지 않는다 (생성 직후 아티팩트로 보관)
+#
+# 2026-08-22 실행에서 PR 생성 권한이 없어 마지막 단계가 실패하면서,
+# 이미 생성해 비용을 지불한 글을 통째로 날린 적이 있습니다.
+# 아래 구조는 그 재발을 막기 위한 것입니다.
+
 on:
   schedule:
     - cron: '0 0 * * 5' # UTC 금 00:00 = KST 금 09:00
@@ -13,6 +23,11 @@ on:
         default: '1'
       direct:
         description: 'PR 없이 main에 바로 커밋'
+        type: boolean
+        required: false
+        default: false
+      dry_run:
+        description: '점검만 하고 생성하지 않음 (비용 0)'
         type: boolean
         required: false
         default: false
@@ -35,27 +50,97 @@ jobs:
         with:
           node-version: '20'
 
+      # ── 돈을 쓰기 전에 여기서 다 막습니다 ──────────────────
+      - name: 사전 점검
+        id: preflight
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          fail=0
+
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY 시크릿이 없습니다. 생성을 시작하지 않습니다."
+            fail=1
+          else
+            echo "API 키 확인"
+          fi
+
+          COUNT="${{ github.event.inputs.count || '1' }}"
+          case "$COUNT" in
+            ''|*[!0-9]*)
+              echo "::error::생성할 글 수가 숫자가 아닙니다: $COUNT"
+              fail=1
+              ;;
+            *)
+              if [ "$COUNT" -gt 10 ]; then
+                echo "::error::한 번에 ${COUNT}편을 생성하려 합니다. 비용이 큽니다. 나눠서 실행하세요."
+                fail=1
+              fi
+              ;;
+          esac
+
+          PENDING=$(node -e "const t=require('./pipeline/topics.json');const a=Array.isArray(t)?t:(t.topics||[]);console.log(a.filter(x=>!x.published).length)")
+          COST=$(node -e "console.log((Number('$COUNT')*0.35).toFixed(2))")
+          echo "대기 주제 ${PENDING}개 · 생성 요청 ${COUNT}편 · 예상 비용 약 \$${COST}"
+
+          {
+            echo "### 사전 점검"
+            echo ""
+            echo "- 대기 주제: ${PENDING}개"
+            echo "- 생성 요청: ${COUNT}편"
+            echo "- 예상 비용: 약 \$${COST}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          [ "$fail" -eq 0 ] || exit 1
+
+      - name: 점검만 하고 종료
+        if: github.event.inputs.dry_run == 'true'
+        run: |
+          echo "dry_run 이므로 여기서 멈춥니다. 비용이 발생하지 않았습니다."
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**dry_run: 생성하지 않고 종료했습니다. 비용 0원.**" >> "$GITHUB_STEP_SUMMARY"
+
       - name: 의존성 설치
+        if: github.event.inputs.dry_run != 'true'
         working-directory: pipeline
         run: npm ci || npm install
 
+      # ── 여기서부터 비용이 발생합니다 ──────────────────────
       - name: 주제 큐 보충
+        if: github.event.inputs.dry_run != 'true'
         working-directory: pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node replenish.mjs
 
       - name: 글 생성
+        if: github.event.inputs.dry_run != 'true'
         working-directory: pipeline
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node generate.mjs --count "${{ github.event.inputs.count || '1' }}"
 
       - name: 목록·사이트맵 재생성
+        if: github.event.inputs.dry_run != 'true'
         working-directory: pipeline
         run: node build.mjs
 
+      # 비용을 지불한 결과물을 가장 먼저 안전한 곳에 둡니다.
+      # 이 아래 단계가 전부 실패해도 여기서 내려받을 수 있습니다.
+      - name: 생성물 보관
+        if: always() && github.event.inputs.dry_run != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-posts
+          path: |
+            site/posts/
+            site/_drafts/
+            pipeline/topics.json
+          retention-days: 90
+          if-no-files-found: warn
+
       - name: 변경 사항 확인
+        if: github.event.inputs.dry_run != 'true'
         id: diff
         run: |
           if [ -z "$(git status --porcelain)" ]; then
@@ -63,6 +148,7 @@ jobs:
             echo "생성된 변경 사항이 없습니다."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            git status --porcelain
           fi
 
       - name: 커밋
@@ -77,6 +163,8 @@ jobs:
         if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct == 'true'
         run: git push
 
+      # PR 생성이 막혀 있어도 브랜치는 남기고, 수동으로 열 수 있는 링크를 띄웁니다.
+      # 실패해도 워크플로를 죽이지 않습니다. 글은 이미 브랜치와 아티팩트에 있습니다.
       - name: Pull Request 생성
         if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct != 'true'
         env:
@@ -85,8 +173,26 @@ jobs:
           BRANCH="post/$(date -u +%Y%m%d-%H%M)"
           git checkout -b "$BRANCH"
           git push -u origin "$BRANCH"
-          gh pr create \
-            --title "새 가이드 글 ($(date -u +%Y-%m-%d))" \
-            --body "자동 생성된 초안입니다. 수치와 제도 설명이 정확한지 확인한 뒤 머지하세요." \
-            --base "${{ github.ref_name }}" \
-            --head "$BRANCH"
+          echo "브랜치를 올렸습니다: $BRANCH"
+
+          if gh pr create \
+               --title "새 가이드 글 ($(date -u +%Y-%m-%d))" \
+               --body "자동 생성된 초안입니다. 수치와 제도 설명이 정확한지 확인한 뒤 머지하세요." \
+               --base "${{ github.ref_name }}" \
+               --head "$BRANCH"; then
+            echo "PR을 열었습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            URL="${{ github.server_url }}/${{ github.repository }}/compare/${{ github.ref_name }}...${BRANCH}?expand=1"
+            echo "::warning::PR 자동 생성에 실패했습니다. 브랜치 ${BRANCH} 는 그대로 남아 있습니다."
+            {
+              echo "### PR을 자동으로 열지 못했습니다"
+              echo ""
+              echo "글은 안전합니다. 브랜치 \`${BRANCH}\` 에 커밋돼 있고, 이 실행의 아티팩트에도 들어 있습니다."
+              echo ""
+              echo "직접 여시려면: [${BRANCH} PR 열기](${URL})"
+              echo ""
+              echo "매번 막힌다면 저장소 Settings → Actions → General 에서"
+              echo "\"Allow GitHub Actions to create and approve pull requests\" 를 켜거나,"
+              echo "이 워크플로를 \`direct: true\` 로 실행하세요."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
