@@ -46,7 +46,7 @@ function renderSources(sources) {
         `    <li><a href="${esc(s.url)}" rel="nofollow noopener" target="_blank">${esc(s.name)}</a></li>`
     )
     .join('\n');
-  return `\n  <h2>참고한 자료</h2>\n  <ul>\n${items}\n  </ul>\n`;
+  return `\n  <h2>참고한 자료</h2>\n  <ul class="sources">\n${items}\n  </ul>\n`;
 }
 
 /** 같은 폴더의 다른 글로 연결합니다. 크롤링 경로를 늘리고 체류시간을 높입니다. */

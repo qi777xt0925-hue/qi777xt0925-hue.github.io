@@ -1,12 +1,14 @@
 name: 가이드 글 생성
 
-# 매주 금요일 오전 9시(KST)에 한 편 생성해 Pull Request로 올립니다.
-# 검토 후 머지하면 pages.yml이 배포합니다.
+# 매주 금요일 오전 9시(KST)에 한 편 생성해 main에 바로 올립니다.
+# 사람의 승인 없이 발행되므로, 사람이 하던 검토를 validate.mjs가 대신합니다.
+# 검수를 통과하지 못한 글은 site/_drafts/ 로 격리되고 사이트에 올라가지 않습니다.
+# 격리가 생기면 이슈가 열려 메일로 알려줍니다.
 #
 # 글 생성은 Anthropic API를 호출하므로 실행할 때마다 비용이 듭니다(1편당 약 $0.35).
 # 그래서 이 워크플로는 두 가지를 지킵니다.
 #   1) 돈을 쓰기 전에 먼저 점검한다 (API 키·요청 편수·큐 상태)
-#   2) 돈을 쓴 뒤에는 결과물을 잃지 않는다 (생성 직후 아티팩트로 보관)
+#   2) 돈을 쓴 뒤에는 결과물을 잃지 않는다 (검수 결과와 무관하게 아티팩트로 보관)
 #
 # 2026-08-22 실행에서 PR 생성 권한이 없어 마지막 단계가 실패하면서,
 # 이미 생성해 비용을 지불한 글을 통째로 날린 적이 있습니다.
@@ -21,8 +23,8 @@ on:
         description: '생성할 글 수'
         required: false
         default: '1'
-      direct:
-        description: 'PR 없이 main에 바로 커밋'
+      pr:
+        description: 'main에 바로 올리지 않고 PR로 검토받기'
         type: boolean
         required: false
         default: false
@@ -35,6 +37,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 concurrency:
   group: publish
@@ -79,6 +82,16 @@ jobs:
               ;;
           esac
 
+          # 정기 실행은 사람이 보지 않으므로 검수를 통과하면 main에 바로 올립니다.
+          # 수동 실행에서 pr 체크박스를 켜면 PR로 돌립니다.
+          if [ "${{ github.event.inputs.pr }}" = "true" ]; then
+            echo "mode=pr" >> "$GITHUB_OUTPUT"
+            echo "발행 방식: PR (수동 검토)"
+          else
+            echo "mode=direct" >> "$GITHUB_OUTPUT"
+            echo "발행 방식: main에 직접 푸시 (검수 통과 시)"
+          fi
+
           PENDING=$(node -e "const t=require('./pipeline/topics.json');const a=Array.isArray(t)?t:(t.topics||[]);console.log(a.filter(x=>!x.published).length)")
           COST=$(node -e "console.log((Number('$COUNT')*0.35).toFixed(2))")
           echo "대기 주제 ${PENDING}개 · 생성 요청 ${COUNT}편 · 예상 비용 약 \$${COST}"
@@ -120,13 +133,42 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: node generate.mjs --count "${{ github.event.inputs.count || '1' }}"
 
+      # 이번 실행에서 새로 생긴 글만 검수합니다.
+      # 이미 발행된 옛 글까지 검사하면, 지금 기준에 안 맞는 과거 글 때문에
+      # 멀쩡한 새 글까지 발행이 막힙니다.
+      - name: 새 글 목록 확인
+        if: github.event.inputs.dry_run != 'true'
+        id: fresh
+        run: |
+          SLUGS=$(git status --porcelain site/posts \
+            | awk '{print $NF}' \
+            | sed -n 's#^site/posts/\(.*\)\.html$#\1#p' \
+            | paste -sd, -)
+          echo "slugs=$SLUGS" >> "$GITHUB_OUTPUT"
+          if [ -z "$SLUGS" ]; then
+            echo "새로 생긴 글이 없습니다."
+          else
+            echo "새 글: $SLUGS"
+          fi
+
+      # ── 사람이 하던 검토를 여기서 대신합니다 ──────────────
+      # 낡은 요율, 얇은 분량, 출처 없음, 깨진 링크, 초안 흔적, 중복을 검사합니다.
+      # 탈락한 글은 site/_drafts/ 로 옮겨지고 주제는 다시 대기 상태가 됩니다.
+      - name: 자동 검수
+        if: github.event.inputs.dry_run != 'true' && steps.fresh.outputs.slugs != ''
+        id: validate
+        continue-on-error: true
+        working-directory: pipeline
+        run: node validate.mjs --only "${{ steps.fresh.outputs.slugs }}" --quarantine
+
+      # 검수에서 격리가 일어났을 수 있으므로 목록과 사이트맵은 검수 뒤에 다시 만듭니다.
       - name: 목록·사이트맵 재생성
         if: github.event.inputs.dry_run != 'true'
         working-directory: pipeline
         run: node build.mjs
 
-      # 비용을 지불한 결과물을 가장 먼저 안전한 곳에 둡니다.
-      # 이 아래 단계가 전부 실패해도 여기서 내려받을 수 있습니다.
+      # 비용을 지불한 결과물은 검수 결과와 무관하게 보관합니다.
+      # 격리된 글도 _drafts 에 들어 있어 여기서 그대로 내려받을 수 있습니다.
       - name: 생성물 보관
         if: always() && github.event.inputs.dry_run != 'true'
         uses: actions/upload-artifact@v4
@@ -143,12 +185,21 @@ jobs:
         if: github.event.inputs.dry_run != 'true'
         id: diff
         run: |
+          # site/_drafts/ 는 .gitignore에 있으므로 격리된 초안은 애초에 커밋되지 않습니다.
+          # 새 글이 전부 격리돼도 큐 보충 결과(topics.json)는 남으므로 그것만이라도 커밋합니다.
           if [ -z "$(git status --porcelain)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "생성된 변경 사항이 없습니다."
+            echo "커밋할 변경이 없습니다."
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git status --porcelain
+          fi
+
+          if [ -z "$(git status --porcelain site/posts)" ]; then
+            echo "posts=false" >> "$GITHUB_OUTPUT"
+            echo "발행할 새 글은 없습니다. (검수 탈락이거나 생성 실패)"
+          else
+            echo "posts=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: 커밋
@@ -157,16 +208,28 @@ jobs:
           git config user.name  "content-bot"
           git config user.email "content-bot@users.noreply.github.com"
           git add -A
-          git commit -m "글 발행: $(date -u +%Y-%m-%d)"
+          if [ "${{ steps.diff.outputs.posts }}" = "true" ]; then
+            git commit -m "글 발행: $(date -u +%Y-%m-%d)"
+          else
+            git commit -m "주제 큐 보충: $(date -u +%Y-%m-%d)"
+          fi
 
+      # 발행할 글이 없고 큐 보충만 있었다면 PR로 돌릴 이유가 없으므로 이 경우도 바로 푸시합니다.
       - name: main에 직접 푸시
-        if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct == 'true'
-        run: git push
+        if: steps.diff.outputs.changed == 'true' && (steps.preflight.outputs.mode == 'direct' || steps.diff.outputs.posts != 'true')
+        run: |
+          git push
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.diff.outputs.posts }}" = "true" ]; then
+            echo "**검수를 통과해 main에 발행했습니다.** 배포와 색인 통보가 이어서 돌아갑니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "발행할 글은 없었고, 주제 큐 보충 결과만 저장했습니다." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       # PR 생성이 막혀 있어도 브랜치는 남기고, 수동으로 열 수 있는 링크를 띄웁니다.
       # 실패해도 워크플로를 죽이지 않습니다. 글은 이미 브랜치와 아티팩트에 있습니다.
       - name: Pull Request 생성
-        if: steps.diff.outputs.changed == 'true' && github.event.inputs.direct != 'true'
+        if: steps.diff.outputs.posts == 'true' && steps.preflight.outputs.mode == 'pr'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -177,7 +240,7 @@ jobs:
 
           if gh pr create \
                --title "새 가이드 글 ($(date -u +%Y-%m-%d))" \
-               --body "자동 생성된 초안입니다. 수치와 제도 설명이 정확한지 확인한 뒤 머지하세요." \
+               --body "자동 생성된 초안입니다. 자동 검수는 통과했지만 수동 검토를 요청했습니다." \
                --base "${{ github.ref_name }}" \
                --head "$BRANCH"; then
             echo "PR을 열었습니다." >> "$GITHUB_STEP_SUMMARY"
@@ -190,9 +253,26 @@ jobs:
               echo "글은 안전합니다. 브랜치 \`${BRANCH}\` 에 커밋돼 있고, 이 실행의 아티팩트에도 들어 있습니다."
               echo ""
               echo "직접 여시려면: [${BRANCH} PR 열기](${URL})"
-              echo ""
-              echo "매번 막힌다면 저장소 Settings → Actions → General 에서"
-              echo "\"Allow GitHub Actions to create and approve pull requests\" 를 켜거나,"
-              echo "이 워크플로를 \`direct: true\` 로 실행하세요."
             } >> "$GITHUB_STEP_SUMMARY"
           fi
+
+      # ── 검수에서 걸린 글이 있으면 이슈로 알립니다 ─────────
+      # 사람이 Actions 탭을 들여다보지 않으므로, 메일이 가는 이슈로 알려야 합니다.
+      - name: 검수 탈락 알림
+        if: always() && steps.validate.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create \
+            --title "자동 검수에서 글이 걸렸습니다 ($(date -u +%Y-%m-%d))" \
+            --label "검수" \
+            --body "$(printf '%s\n' \
+              "이번 주 글이 자동 검수를 통과하지 못해 발행하지 않았습니다." \
+              "" \
+              "글은 사라지지 않았습니다. \`site/_drafts/\` 에 격리돼 있고, 주제는 다시 대기 상태로 돌아가 다음 주에 새로 시도합니다." \
+              "" \
+              "무엇이 걸렸는지: [실행 기록에서 '자동 검수' 단계]($RUN_URL)" \
+              "" \
+              "손볼 필요는 없습니다. 다음 주에 같은 주제로 다시 생성됩니다. 매주 반복되면 그때 주제를 바꾸는 걸 고려하세요.")" \
+            || echo "::warning::이슈 생성에 실패했습니다. 실행 요약을 직접 확인하세요: $RUN_URL"
