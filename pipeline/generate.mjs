@@ -17,6 +17,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
 
 const config = readJson(path.join(HERE, 'site.config.json'));
+// 검수기와 같은 기준을 씁니다 — 어느 도메인을 공식 출처로 볼지.
+const FACTS = readJson(path.join(HERE, 'facts.json'));
 
 // ── 인자 파싱 ────────────────────────────────────────────────
 const argv = process.argv.slice(2);
@@ -84,7 +86,7 @@ const ARTICLE_SCHEMA = {
     sources: {
       type: 'array',
       description:
-        '본문의 근거가 된 공식 자료 2~4개. 국민연금공단·국세청·고용노동부·법제처 같은 1차 출처를 우선하고, 실제로 확인한 것만 넣으세요. 확인하지 못했으면 빈 배열.',
+        '본문의 근거가 된 공식 자료 2~4개. 국민연금공단·국세청·고용노동부·법제처 같은 1차 출처를 우선합니다. 웹 검색으로 실제 열어본 자료만 넣고, URL은 검색 결과에 나온 주소를 그대로 옮기세요(지어내지 마세요). 돈·세금 글은 근거 표시가 필수이므로 비워 두면 안 됩니다.',
       items: {
         type: 'object',
         additionalProperties: false,
@@ -141,6 +143,24 @@ async function writeArticle(topic) {
   const messages = [{ role: 'user', content: userPrompt }];
   let response;
 
+  // 웹 검색이 실제로 열어본 자료를 모아둡니다.
+  // 모델이 sources를 비워서 돌려주는 일이 있는데, 그때 여기서 출처를 채웁니다.
+  // 응답에 이미 들어 있는 값이라 추가 비용이 들지 않습니다.
+  const searchHits = [];
+  const harvest = (content) => {
+    for (const block of content) {
+      // 검색이 실패하면 content가 배열이 아니라 오류 객체로 옵니다.
+      if (block.type !== 'web_search_tool_result' || !Array.isArray(block.content)) continue;
+      for (const r of block.content) {
+        if (r.type === 'web_search_result' && r.url) searchHits.push(r);
+      }
+    }
+  };
+
+  // 여러 번 이어 붙는 경우 토큰이 누적되므로 비용도 합산해야 합니다.
+  let inTokens = 0;
+  let outTokens = 0;
+
   // 서버 사이드 도구(웹 검색)는 반복 한도에 걸리면 pause_turn으로 멈춥니다.
   for (let attempt = 0; attempt < 6; attempt++) {
     response = await client.messages.create({
@@ -154,6 +174,10 @@ async function writeArticle(topic) {
         format: { type: 'json_schema', schema: ARTICLE_SCHEMA },
       },
     });
+
+    harvest(response.content);
+    inTokens += response.usage.input_tokens;
+    outTokens += response.usage.output_tokens;
 
     if (response.stop_reason === 'refusal') {
       throw new Error(
@@ -177,15 +201,46 @@ async function writeArticle(topic) {
   const raw = textBlocks.at(-1)?.text;
   if (!raw) throw new Error('응답에 텍스트 블록이 없습니다.');
 
-  const usage = response.usage;
   const cost =
-    (usage.input_tokens / 1e6) * config.pricing.inputPerMTok +
-    (usage.output_tokens / 1e6) * config.pricing.outputPerMTok;
-  console.log(
-    `    토큰 ${usage.input_tokens} in / ${usage.output_tokens} out · 약 $${cost.toFixed(3)}`
-  );
+    (inTokens / 1e6) * config.pricing.inputPerMTok +
+    (outTokens / 1e6) * config.pricing.outputPerMTok;
+  console.log(`    토큰 ${inTokens} in / ${outTokens} out · 약 $${cost.toFixed(3)}`);
 
-  return JSON.parse(raw);
+  const article = JSON.parse(raw);
+  if (!article.sources?.length) {
+    article.sources = fallbackSources(searchHits);
+    console.log(
+      article.sources.length
+        ? `    ! 모델이 출처를 비워서 돌려줬습니다. 검색 기록에서 ${article.sources.length}개를 채웁니다.`
+        : '    ! 출처를 채우지 못했습니다. 검수에서 걸러집니다.'
+    );
+  }
+  return article;
+}
+
+/**
+ * 웹 검색이 실제로 열어본 자료 중에서 출처로 쓸 것을 고릅니다.
+ * 모델이 지어낸 URL이 아니라 검색 결과에 실재하는 주소이므로 링크가 죽어 있을 위험이 낮습니다.
+ * 공식 기관(go.kr·or.kr)을 먼저 채우고, 모자라면 나머지로 채웁니다.
+ */
+function fallbackSources(hits, limit = 3) {
+  const seen = new Set();
+  const unique = [];
+  for (const h of hits) {
+    let host;
+    try {
+      host = new URL(h.url).hostname;
+    } catch {
+      continue; // 주소가 깨졌으면 버립니다
+    }
+    if (seen.has(host)) continue; // 같은 기관을 여러 줄 넣지 않습니다
+    seen.add(host);
+    unique.push({ name: (h.title || host).trim().slice(0, 80), url: h.url, host });
+  }
+  const official = (h) => FACTS.공식도메인.some((d) => h.host.endsWith(d));
+  return [...unique.filter(official), ...unique.filter((h) => !official(h))]
+    .slice(0, limit)
+    .map(({ name, url }) => ({ name, url }));
 }
 
 // ── 실행 ────────────────────────────────────────────────────

@@ -250,8 +250,10 @@ if (QUARANTINE && bad.length) {
   for (const r of bad) {
     const from = path.join(POSTS, `${r.slug}.html`);
     fs.renameSync(from, path.join(DRAFTS, `${r.slug}.html`));
+    // published는 지우지 말고 null로 되돌립니다. 키를 없애면 미발행 주제의 형식이 달라져
+    // topics.json에 불필요한 차이가 남습니다.
     const t = topics.find((t) => t.slug === r.slug);
-    if (t) { delete t.published; delete t.h1; delete t.description; }
+    if (t) { t.published = null; delete t.h1; delete t.description; }
     console.log(`격리: ${r.slug} → site/_drafts/ (주제는 대기 상태로 되돌림)`);
   }
   fs.writeFileSync(topicsPath, JSON.stringify(topics, null, 2) + '\n');

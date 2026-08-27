@@ -264,6 +264,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # 라벨이 없으면 gh가 이슈 생성 자체를 거부합니다. 미리 만들어 둡니다.
+          gh label create "검수" --color FBCA04 --description "자동 검수에서 걸린 글" 2>/dev/null || true
+
           gh issue create \
             --title "자동 검수에서 글이 걸렸습니다 ($(date -u +%Y-%m-%d))" \
             --label "검수" \
@@ -275,4 +278,7 @@ jobs:
               "무엇이 걸렸는지: [실행 기록에서 '자동 검수' 단계]($RUN_URL)" \
               "" \
               "손볼 필요는 없습니다. 다음 주에 같은 주제로 다시 생성됩니다. 매주 반복되면 그때 주제를 바꾸는 걸 고려하세요.")" \
+            || gh issue create \
+                 --title "자동 검수에서 글이 걸렸습니다 ($(date -u +%Y-%m-%d))" \
+                 --body "이번 주 글이 자동 검수를 통과하지 못해 발행하지 않았습니다. 글은 site/_drafts/ 에 있고 주제는 대기열로 돌아갔습니다. 자세한 내용: $RUN_URL" \
             || echo "::warning::이슈 생성에 실패했습니다. 실행 요약을 직접 확인하세요: $RUN_URL"
