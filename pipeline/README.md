@@ -81,7 +81,7 @@ npm run build
 
 ## 자동 실행
 
-`.github/workflows/publish.yml`이 매주 금요일 오전 9시(KST)에 한 편 생성하고, 자동 검수를 통과하면 **사람의 승인 없이 main에 바로 올립니다.** 그러면 `pages.yml`이 `site/`를 GitHub Pages에 배포하고, `indexnow.yml`이 네이버·Bing에 색인을 통보합니다.
+`.github/workflows/publish.yml`이 한 편 생성하고, 자동 검수를 통과하면 **사람의 승인 없이 main에 바로 올립니다.** 정기 실행은 크레딧을 아끼려고 2026-08-30에 껐습니다(주석 처리). 켜면 매주 월요일 오전 9시(KST)에 돕니다. 그러면 `pages.yml`이 `site/`를 GitHub Pages에 배포하고, `indexnow.yml`이 네이버·Bing에 색인을 통보합니다.
 
 리포지터리 Settings → Secrets and variables → Actions에 `ANTHROPIC_API_KEY`를 등록해야 동작합니다.
 

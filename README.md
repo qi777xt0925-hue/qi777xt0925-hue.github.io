@@ -16,7 +16,7 @@ pipeline/                 글 자동 생성 (자세한 내용은 pipeline/README
   validate.mjs            발행 전 자동 검수
   facts.json              현재 맞는 요율 = 검수 기준  ← 요율 바뀌면 여기도 수정
 .github/workflows/
-  publish.yml             매주 금요일 오전 9시(KST) 글 생성 → 검수 → main 푸시
+  publish.yml             글 생성 → 검수 → main 푸시 (자동 실행은 꺼둠, 수동으로만)
   indexnow.yml            배포 후 네이버·Bing에 색인 통보
   pages.yml               site/ 변경 시 자동 배포
 serve.ps1                 로컬 미리보기 서버 (http://localhost:8787)
@@ -32,7 +32,7 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 
 ## 어떻게 돌아가나
 
-1. `publish.yml`이 매주 금요일 오전 9시에 실행됩니다 (GitHub 서버에서 — 내 컴퓨터는 꺼져 있어도 됩니다)
+1. `publish.yml`을 실행합니다 (GitHub 서버에서 — 내 컴퓨터는 꺼져 있어도 됩니다). **정기 실행은 2026-08-30에 꺼뒀습니다.** 켜면 매주 월요일 오전 9시에 돕니다
 2. 대기 주제가 8개 미만이면 `replenish.mjs`가 새 주제를 채웁니다
 3. `generate.mjs`가 글 한 편을 씁니다
 4. `validate.mjs`가 자동 검수합니다 — 낡은 요율·분량·출처·중복 등
