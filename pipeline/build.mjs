@@ -31,7 +31,9 @@ const posts = topics
 fs.writeFileSync(path.join(SITE, 'guides.html'), renderIndexPage(posts, config), 'utf8');
 
 // ── sitemap.xml ─────────────────────────────────────────────
-fs.writeFileSync(path.join(SITE, 'sitemap.xml'), renderSitemap(posts, config), 'utf8');
+// site/ 바로 아래의 .html을 훑어 넣습니다. 계산기를 새로 만들어도 자동으로 잡힙니다.
+const pages = fs.readdirSync(SITE).filter((f) => f.endsWith('.html'));
+fs.writeFileSync(path.join(SITE, 'sitemap.xml'), renderSitemap(posts, config, pages), 'utf8');
 
 // ── robots.txt ──────────────────────────────────────────────
 fs.writeFileSync(
@@ -75,7 +77,8 @@ ${latest
   console.warn(`! index.html에 ${START} / ${END} 주석이 없어 최신 글 영역을 건너뛰었습니다.`);
 }
 
-console.log(`빌드 완료 — 글 ${posts.length}편, sitemap ${posts.length + 3}개 URL`);
+const sitemapCount = (fs.readFileSync(path.join(SITE, 'sitemap.xml'), 'utf8').match(/<loc>/g) || []).length;
+console.log(`빌드 완료 — 글 ${posts.length}편, sitemap ${sitemapCount}개 URL`);
 if (config.origin.includes('example.com')) {
   console.warn('! site.config.json의 origin이 아직 example.com입니다. 실제 도메인으로 바꾸세요.');
 }

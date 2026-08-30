@@ -214,11 +214,26 @@ ${items}
 }
 
 /** sitemap.xml */
-export function renderSitemap(posts, config) {
+/**
+ * @param {string[]} pages site/ 바로 아래의 .html 파일명 목록. 계산기를 새로 만들어도
+ *                         이 목록에서 자동으로 잡히므로 여기를 손으로 고칠 일이 없습니다.
+ */
+export function renderSitemap(posts, config, pages = []) {
+  // 검색엔진 소유확인용 파일과 개인정보처리방침은 색인할 필요가 없습니다.
+  const skip = (f) => /^(google|naver)[0-9a-f]{8,}\.html$/i.test(f) || f === 'privacy.html';
+
   const staticUrls = [
     { loc: `${config.origin}/`, priority: '1.0', changefreq: 'weekly' },
-    { loc: `${config.origin}/salary.html`, priority: '0.9', changefreq: 'monthly' },
     { loc: `${config.origin}/guides.html`, priority: '0.8', changefreq: 'weekly' },
+    ...pages
+      .filter((f) => !skip(f) && f !== 'index.html' && f !== 'guides.html')
+      .sort()
+      .map((f) => ({
+        loc: `${config.origin}/${f}`,
+        // 연봉 계산기가 이 사이트의 대표 페이지입니다.
+        priority: f === 'salary.html' ? '0.9' : '0.8',
+        changefreq: 'monthly',
+      })),
   ];
   const postUrls = posts.map((p) => ({
     loc: encodeURI(`${config.origin}/posts/${p.slug}.html`),
