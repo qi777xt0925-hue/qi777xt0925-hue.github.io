@@ -138,7 +138,16 @@ function collectSources(html) {
   const sec = html.match(/<ul[^>]*class="sources"[\s\S]*?<\/ul>/i)?.[0] ?? '';
   const pool = sec || html;
   return [...pool.matchAll(/href="(https?:\/\/[^"]+)"/g)]
-    .map((m) => m[1])
+    // HTML 안에서는 &가 &amp;로 이스케이프돼 있습니다. 그대로 요청하면
+    // 멀쩡한 주소가 400을 돌려줘 죽은 링크로 잘못 보고됩니다.
+    .map((m) =>
+      m[1]
+        .replace(/&amp;/g, '&')
+        .replace(/&#39;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+    )
     .filter((u) => !u.includes('qi777xt0925-hue.github.io'));
 }
 
