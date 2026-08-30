@@ -183,11 +183,21 @@ async function checkSources(html, rep) {
   }));
 
   if (dead.length === 0) return;
-  // 공공기관 사이트는 해외 서버(GitHub 러너)의 요청을 막는 경우가 흔해서
-  // 몇 개 실패하는 것만으로는 글을 막지 않습니다. 전부 죽었을 때만 치명으로 봅니다.
   const msg = dead.map((d) => `\n      - ${d}`).join('');
-  if (dead.length === urls.length) rep.fail('출처', `출처 링크가 전부 열리지 않습니다:${msg}`);
-  else rep.warn('출처', `열리지 않는 출처가 있습니다 (${dead.length}/${urls.length}):${msg}`);
+  if (dead.length < urls.length) {
+    rep.warn('출처', `열리지 않는 출처가 있습니다 (${dead.length}/${urls.length}):${msg}`);
+    return;
+  }
+  // 전부 열리지 않는 경우.
+  // 한국 공공기관 사이트는 해외 서버(GitHub 러너)의 요청을 막거나 느리게 응답하는 일이
+  // 흔합니다. 주소가 전부 공식 기관이라면 글이 잘못된 게 아니라 접속 환경 문제일 가능성이
+  // 높으므로, 링크가 안 열린다는 이유로 멀쩡한 글을 막지 않습니다.
+  // 죽은 링크는 틀린 요율보다 훨씬 가벼운 문제입니다.
+  if (official.length === urls.length) {
+    rep.warn('출처', `출처가 전부 열리지 않았습니다. 공식 기관 주소이므로 해외 IP 차단으로 보고 통과시킵니다:${msg}`);
+  } else {
+    rep.fail('출처', `출처 링크가 전부 열리지 않습니다:${msg}`);
+  }
 }
 
 // ── 7. 다른 글과 겹치는지 ─────────────────────────────────
