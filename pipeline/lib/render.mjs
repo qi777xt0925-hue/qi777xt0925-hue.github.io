@@ -69,12 +69,17 @@ function renderMorePosts(others) {
  * @param {object} article  모델이 생성한 글 데이터
  * @param {object} topic    topics.json 항목 (slug, related)
  * @param {object} config   site.config.json
- * @param {string} date     YYYY-MM-DD
+ * @param {string} date     발행일 YYYY-MM-DD
  * @param {Array}  others   이미 발행된 다른 글 (내부 링크용)
+ * @param {string} [modified] 최종 수정일 YYYY-MM-DD. 나중에 글을 고쳤을 때만 넘깁니다.
+ *                            검색엔진은 발행일과 수정일을 구분해서 읽으므로 둘을 같게 두면
+ *                            내용을 갱신해도 최신 글로 보지 않습니다.
  */
-export function renderPost(article, topic, config, date, others = []) {
+export function renderPost(article, topic, config, date, others = [], modified = null) {
   const url = encodeURI(`${config.origin}/posts/${topic.slug}.html`);
   const rel = topic.related;
+  const lastmod = modified || date;
+  const wasUpdated = lastmod !== date;
 
   // 검색엔진이 글쓴이·발행일·소속을 구조적으로 읽게 합니다. 금융 주제(YMYL)에서 특히 중요합니다.
   const jsonLd = JSON.stringify({
@@ -83,7 +88,7 @@ export function renderPost(article, topic, config, date, others = []) {
     headline: article.title,
     description: article.description,
     datePublished: date,
-    dateModified: date,
+    dateModified: lastmod,
     inLanguage: 'ko-KR',
     author: { '@type': 'Organization', name: config.author },
     publisher: { '@type': 'Organization', name: config.siteName },
@@ -112,7 +117,7 @@ export function renderPost(article, topic, config, date, others = []) {
 <meta property="og:description" content="${esc(article.description)}">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="${esc(date)}">
-<meta property="article:modified_time" content="${esc(date)}">
+<meta property="article:modified_time" content="${esc(lastmod)}">
 <script type="application/ld+json">${jsonLd}</script>
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="${FAVICON}">
@@ -130,7 +135,7 @@ export function renderPost(article, topic, config, date, others = []) {
 <main class="wrap">
   <h1>${esc(article.h1)}</h1>
   <p class="lead">${esc(article.lead)}</p>
-  <p class="lead" style="font-size:13px">${esc(date)} 기준</p>
+  <p class="lead" style="font-size:13px">${esc(lastmod)} 기준${wasUpdated ? ` · ${esc(date)} 발행` : ''}</p>
 
   <div class="ad"><!-- 광고 슬롯 --></div>
 
@@ -146,7 +151,7 @@ ${renderMorePosts(others)}
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
     요율과 제도는 변경될 수 있으니 최종 확인은 관계 기관 공식 자료를 따르세요.
-    <br>최종 수정: ${esc(date)} · <a href="../privacy.html">개인정보처리방침</a>
+    <br>최종 수정: ${esc(lastmod)} · <a href="../privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
