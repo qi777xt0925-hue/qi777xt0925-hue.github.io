@@ -17,6 +17,8 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
 
 const config = readJson(path.join(HERE, 'site.config.json'));
+// 검수기와 같은 기준을 씁니다 — 어느 도메인을 공식 출처로 볼지.
+const FACTS = readJson(path.join(HERE, 'facts.json'));
 
 // ── 인자 파싱 ────────────────────────────────────────────────
 const argv = process.argv.slice(2);
@@ -84,7 +86,7 @@ const ARTICLE_SCHEMA = {
     sources: {
       type: 'array',
       description:
-        '본문의 근거가 된 공식 자료 2~4개. 국민연금공단·국세청·고용노동부·법제처 같은 1차 출처를 우선하고, 실제로 확인한 것만 넣으세요. 확인하지 못했으면 빈 배열.',
+        '본문의 근거가 된 공식 자료 2~4개. 국민연금공단·국세청·고용노동부·법제처 같은 1차 출처를 우선합니다. 웹 검색으로 실제 열어본 자료만 넣고, URL은 검색 결과에 나온 주소를 그대로 옮기세요(지어내지 마세요). 돈·세금 글은 근거 표시가 필수이므로 비워 두면 안 됩니다.',
       items: {
         type: 'object',
         additionalProperties: false,
@@ -114,7 +116,16 @@ const SYSTEM = `당신은 한국 생활 금융 정보 사이트의 필자입니�
 - 독자를 "여러분"이라고 부르지 말고, 필요하면 주어를 생략하세요.
 - 과장하거나 단정하지 마세요. 예외가 있는 규칙은 예외가 있다고 쓰세요.
 - 세무·법률 판단이 필요한 대목에서는 전문가 상담이 필요하다고 명시하세요.
-- sources에는 본문 근거가 된 공식 자료만 넣으세요. 검색으로 실제 확인한 URL만 쓰고, 기억에 의존해 주소를 지어내지 마세요. 확인하지 못했다면 빈 배열로 두는 편이 낫습니다.
+- sources에는 본문 근거가 된 공식 자료만 넣으세요. 검색으로 실제 확인한 URL만 쓰고, 기억에 의존해 주소를 지어내지 마세요. 돈·세금 글은 근거 표시가 필수이므로 비워 두지 마세요.
+
+## 반드시 이 값을 쓰세요 (${FACTS._현재요율_확인일} 확인, 출처: ${FACTS._현재요율_출처})
+
+${FACTS.현재요율.map((x) => `- ${x}`).join('\n')}
+
+위 값이 지금 맞는 값입니다. **기억에 남아 있는 예전 요율을 쓰지 마세요.**
+특히 국민연금 4.5%, 건강보험 3.545%, 장기요양 12.95%, 기준소득월액 상한 637만원은 2025년 값이라 지금은 틀립니다.
+예시 계산을 넣을 때도 반드시 위 값으로 계산하세요.
+2025년 값을 언급해야 한다면 "2025년에는 …였다"처럼 과거임을 분명히 밝히세요.
 
 분량: 섹션 4~7개, 전체 1,500~2,500자 정도. 채우기 위한 문단을 넣지 마세요.`;
 
@@ -130,7 +141,7 @@ async function writeArticle(topic) {
 
 이 글은 계산기 사이트에 실립니다. 독자는 계산 결과의 근거를 알고 싶어서 들어옵니다.${
     USE_SEARCH
-      ? '\n\n수치나 제도 기준이 필요한 부분은 웹 검색으로 현재 기준을 확인한 뒤 쓰세요. 검색해도 확실하지 않으면 수치를 쓰지 말고 확인 방법을 안내하세요.'
+      ? '\n\n4대보험 요율·비과세 한도처럼 시스템 프롬프트에 이미 적힌 값은 검색으로 다시 확인하지 말고 그대로 쓰세요. 검색은 거기 없는 것(제도 절차, 신청 기한, 서류명, 최근 개정)에 쓰세요.\n\n다만 **검색은 최소 한 번은 반드시 하세요.** sources에 넣을 공식 기관(국민연금공단·국세청·고용노동부·법제처 등) 페이지 주소를 확보해야 하는데, 기억으로 지어낸 주소는 대개 존재하지 않기 때문입니다. 검색 결과에 나온 주소를 그대로 옮기세요. 검색해도 확실하지 않으면 수치를 쓰지 말고 확인 방법을 안내하세요.'
       : ''
   }`;
 
@@ -140,6 +151,24 @@ async function writeArticle(topic) {
 
   const messages = [{ role: 'user', content: userPrompt }];
   let response;
+
+  // 웹 검색이 실제로 열어본 자료를 모아둡니다.
+  // 모델이 sources를 비워서 돌려주는 일이 있는데, 그때 여기서 출처를 채웁니다.
+  // 응답에 이미 들어 있는 값이라 추가 비용이 들지 않습니다.
+  const searchHits = [];
+  const harvest = (content) => {
+    for (const block of content) {
+      // 검색이 실패하면 content가 배열이 아니라 오류 객체로 옵니다.
+      if (block.type !== 'web_search_tool_result' || !Array.isArray(block.content)) continue;
+      for (const r of block.content) {
+        if (r.type === 'web_search_result' && r.url) searchHits.push(r);
+      }
+    }
+  };
+
+  // 여러 번 이어 붙는 경우 토큰이 누적되므로 비용도 합산해야 합니다.
+  let inTokens = 0;
+  let outTokens = 0;
 
   // 서버 사이드 도구(웹 검색)는 반복 한도에 걸리면 pause_turn으로 멈춥니다.
   for (let attempt = 0; attempt < 6; attempt++) {
@@ -154,6 +183,10 @@ async function writeArticle(topic) {
         format: { type: 'json_schema', schema: ARTICLE_SCHEMA },
       },
     });
+
+    harvest(response.content);
+    inTokens += response.usage.input_tokens;
+    outTokens += response.usage.output_tokens;
 
     if (response.stop_reason === 'refusal') {
       throw new Error(
@@ -177,15 +210,46 @@ async function writeArticle(topic) {
   const raw = textBlocks.at(-1)?.text;
   if (!raw) throw new Error('응답에 텍스트 블록이 없습니다.');
 
-  const usage = response.usage;
   const cost =
-    (usage.input_tokens / 1e6) * config.pricing.inputPerMTok +
-    (usage.output_tokens / 1e6) * config.pricing.outputPerMTok;
-  console.log(
-    `    토큰 ${usage.input_tokens} in / ${usage.output_tokens} out · 약 $${cost.toFixed(3)}`
-  );
+    (inTokens / 1e6) * config.pricing.inputPerMTok +
+    (outTokens / 1e6) * config.pricing.outputPerMTok;
+  console.log(`    토큰 ${inTokens} in / ${outTokens} out · 약 $${cost.toFixed(3)}`);
 
-  return JSON.parse(raw);
+  const article = JSON.parse(raw);
+  if (!article.sources?.length) {
+    article.sources = fallbackSources(searchHits);
+    console.log(
+      article.sources.length
+        ? `    ! 모델이 출처를 비워서 돌려줬습니다. 검색 기록에서 ${article.sources.length}개를 채웁니다.`
+        : '    ! 출처를 채우지 못했습니다. 검수에서 걸러집니다.'
+    );
+  }
+  return article;
+}
+
+/**
+ * 웹 검색이 실제로 열어본 자료 중에서 출처로 쓸 것을 고릅니다.
+ * 모델이 지어낸 URL이 아니라 검색 결과에 실재하는 주소이므로 링크가 죽어 있을 위험이 낮습니다.
+ * 공식 기관(go.kr·or.kr)을 먼저 채우고, 모자라면 나머지로 채웁니다.
+ */
+function fallbackSources(hits, limit = 3) {
+  const seen = new Set();
+  const unique = [];
+  for (const h of hits) {
+    let host;
+    try {
+      host = new URL(h.url).hostname;
+    } catch {
+      continue; // 주소가 깨졌으면 버립니다
+    }
+    if (seen.has(host)) continue; // 같은 기관을 여러 줄 넣지 않습니다
+    seen.add(host);
+    unique.push({ name: (h.title || host).trim().slice(0, 80), url: h.url, host });
+  }
+  const official = (h) => FACTS.공식도메인.some((d) => h.host.endsWith(d));
+  return [...unique.filter(official), ...unique.filter((h) => !official(h))]
+    .slice(0, limit)
+    .map(({ name, url }) => ({ name, url }));
 }
 
 // ── 실행 ────────────────────────────────────────────────────

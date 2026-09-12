@@ -92,7 +92,7 @@ function renderSources(sources) {
         `    <li><a href="${esc(s.url)}" rel="nofollow noopener" target="_blank">${esc(s.name)}</a></li>`
     )
     .join('\n');
-  return `\n  <h2>참고한 자료</h2>\n  <ul>\n${items}\n  </ul>\n`;
+  return `\n  <h2>참고한 자료</h2>\n  <ul class="sources">\n${items}\n  </ul>\n`;
 }
 
 /** 같은 폴더의 다른 글로 연결합니다. 크롤링 경로를 늘리고 체류시간을 높입니다. */
@@ -115,12 +115,17 @@ function renderMorePosts(others) {
  * @param {object} article  모델이 생성한 글 데이터
  * @param {object} topic    topics.json 항목 (slug, related)
  * @param {object} config   site.config.json
- * @param {string} date     YYYY-MM-DD
+ * @param {string} date     발행일 YYYY-MM-DD
  * @param {Array}  others   이미 발행된 다른 글 (내부 링크용)
+ * @param {string} [modified] 최종 수정일 YYYY-MM-DD. 나중에 글을 고쳤을 때만 넘깁니다.
+ *                            검색엔진은 발행일과 수정일을 구분해서 읽으므로 둘을 같게 두면
+ *                            내용을 갱신해도 최신 글로 보지 않습니다.
  */
-export function renderPost(article, topic, config, date, others = []) {
+export function renderPost(article, topic, config, date, others = [], modified = null) {
   const url = encodeURI(`${config.origin}/posts/${topic.slug}.html`);
   const rel = topic.related;
+  const lastmod = modified || date;
+  const wasUpdated = lastmod !== date;
 
   // 검색엔진이 글쓴이·발행일·소속을 구조적으로 읽게 합니다. 금융 주제(YMYL)에서 특히 중요합니다.
   const jsonLd = JSON.stringify({
@@ -129,7 +134,7 @@ export function renderPost(article, topic, config, date, others = []) {
     headline: article.title,
     description: article.description,
     datePublished: date,
-    dateModified: date,
+    dateModified: lastmod,
     inLanguage: 'ko-KR',
     author: { '@type': 'Organization', name: config.author },
     publisher: { '@type': 'Organization', name: config.siteName },
@@ -158,7 +163,7 @@ export function renderPost(article, topic, config, date, others = []) {
 <meta property="og:description" content="${esc(article.description)}">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="${esc(date)}">
-<meta property="article:modified_time" content="${esc(date)}">
+<meta property="article:modified_time" content="${esc(lastmod)}">
 <script type="application/ld+json">${jsonLd}</script>
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="${FAVICON}">
@@ -176,7 +181,7 @@ export function renderPost(article, topic, config, date, others = []) {
 <main class="wrap">
   <h1>${esc(article.h1)}</h1>
   <p class="lead">${esc(article.lead)}</p>
-  <p class="lead" style="font-size:13px">${esc(date)} 기준</p>
+  <p class="lead" style="font-size:13px">${esc(lastmod)} 기준${wasUpdated ? ` · ${esc(date)} 발행` : ''}</p>
 
   <div class="ad"><!-- 광고 슬롯 --></div>
 
@@ -194,7 +199,7 @@ ${renderMorePosts(others)}
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
     요율과 제도는 변경될 수 있으니 최종 확인은 관계 기관 공식 자료를 따르세요.
-    <br>최종 수정: ${esc(date)} · <a href="../privacy.html">개인정보처리방침</a>
+    <br>최종 수정: ${esc(lastmod)} · <a href="../privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
@@ -262,20 +267,27 @@ ${items}
 }
 
 /** sitemap.xml */
-export function renderSitemap(posts, config) {
-  // 계산기 페이지가 사이트의 본체입니다. 하나라도 빠지면 색인에서 사라지므로
-  // 여기에 전부 적어 둡니다. 계산기를 새로 만들면 이 목록에 추가하세요.
-  const calculators = ['salary', 'severance', 'hourly', 'loan', 'rent', 'area'];
+/**
+ * @param {string[]} pages site/ 바로 아래의 .html 파일명 목록. 계산기를 새로 만들어도
+ *                         이 목록에서 자동으로 잡히므로 여기를 손으로 고칠 일이 없습니다.
+ */
+export function renderSitemap(posts, config, pages = []) {
+  // 검색엔진 소유확인용 파일만 뺍니다. 개인정보처리방침은 우선순위를 낮춰 넣어 둡니다 —
+  // 애드센스 심사에서 보는 페이지라 색인돼 있는 편이 낫습니다.
+  const skip = (f) => /^(google|naver)[0-9a-f]{8,}\.html$/i.test(f);
 
   const staticUrls = [
     { loc: `${config.origin}/`, priority: '1.0', changefreq: 'weekly' },
-    ...calculators.map((c) => ({
-      loc: `${config.origin}/${c}.html`,
-      priority: '0.9',
-      changefreq: 'monthly',
-    })),
     { loc: `${config.origin}/guides.html`, priority: '0.8', changefreq: 'weekly' },
-    { loc: `${config.origin}/privacy.html`, priority: '0.3', changefreq: 'yearly' },
+    ...pages
+      .filter((f) => !skip(f) && f !== 'index.html' && f !== 'guides.html')
+      .sort()
+      .map((f) =>
+        f === 'privacy.html'
+          ? { loc: `${config.origin}/${f}`, priority: '0.3', changefreq: 'yearly' }
+          : // 계산기가 이 사이트의 본체이므로 가장 높게 둡니다.
+            { loc: `${config.origin}/${f}`, priority: '0.9', changefreq: 'monthly' }
+      ),
   ];
   const postUrls = posts.map((p) => ({
     loc: encodeURI(`${config.origin}/posts/${p.slug}.html`),

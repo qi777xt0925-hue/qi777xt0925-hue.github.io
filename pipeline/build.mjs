@@ -31,7 +31,9 @@ const posts = topics
 fs.writeFileSync(path.join(SITE, 'guides.html'), renderIndexPage(posts, config), 'utf8');
 
 // ── sitemap.xml ─────────────────────────────────────────────
-const sitemap = renderSitemap(posts, config);
+// site/ 바로 아래의 .html을 훑어 넣습니다. 계산기를 새로 만들어도 자동으로 잡힙니다.
+const pages = fs.readdirSync(SITE).filter((f) => f.endsWith('.html'));
+const sitemap = renderSitemap(posts, config, pages);
 fs.writeFileSync(path.join(SITE, 'sitemap.xml'), sitemap, 'utf8');
 
 // ── robots.txt ──────────────────────────────────────────────
