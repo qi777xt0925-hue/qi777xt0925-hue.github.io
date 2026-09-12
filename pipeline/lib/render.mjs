@@ -7,8 +7,54 @@ export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
 const FAVICON =
   "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>";
 
+/** 표 한 개. 가로 스크롤 컨테이너로 감싸 모바일에서 깨지지 않게 합니다. */
+function renderTable(t) {
+  const head = t.head.map((h) => `<th>${esc(h)}</th>`).join('');
+  const rows = t.rows
+    .map((r) => `      <tr>${r.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`)
+    .join('\n');
+  return `  <div class="scroll">
+    <table class="cmp">
+      <thead><tr>${head}</tr></thead>
+      <tbody>
+${rows}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/** 그 문단에서 가장 중요한 숫자 하나를 카드로 크게 보여줍니다. */
+function renderFigure(f) {
+  return `  <div class="result">
+    <div class="cap">${esc(f.label)}</div>
+    <div class="big">${esc(f.value)}</div>
+  </div>`;
+}
+
+/** 본문에 나온 순서를 그대로 지키는 블록 렌더러입니다. */
+function renderBlocks(blocks) {
+  const out = [];
+  for (const b of blocks) {
+    if (b.type === 'p') out.push(`  <p>${esc(b.text)}</p>`);
+    else if (b.type === 'note') out.push(`  <div class="note">${esc(b.text)}</div>`);
+    else if (b.type === 'ul') {
+      out.push('  <ul>');
+      for (const li of b.items) out.push(`    <li>${esc(li)}</li>`);
+      out.push('  </ul>');
+    } else if (b.type === 'table') out.push(renderTable(b));
+    else if (b.type === 'figure') out.push(renderFigure(b));
+  }
+  return out.join('\n');
+}
+
 function renderSection(sec) {
   const parts = [`  <h2>${esc(sec.heading)}</h2>`];
+
+  // blocks가 있으면 본문 순서를 그대로 따릅니다(표·강조 숫자가 섞인 글).
+  if (sec.blocks?.length) {
+    parts.push(renderBlocks(sec.blocks));
+    return parts.join('\n');
+  }
 
   for (const p of sec.paragraphs ?? []) {
     if (p.trim()) parts.push(`  <p>${esc(p)}</p>`);
@@ -134,6 +180,8 @@ export function renderPost(article, topic, config, date, others = []) {
 
   <div class="ad"><!-- 광고 슬롯 --></div>
 
+${(article.intro ?? []).map((p) => `  <p>${esc(p)}</p>`).join('\n')}
+
 ${(article.sections ?? []).map(renderSection).join('\n\n')}
 ${relatedBox}
   <div class="ad"><!-- 광고 슬롯 --></div>
@@ -215,10 +263,19 @@ ${items}
 
 /** sitemap.xml */
 export function renderSitemap(posts, config) {
+  // 계산기 페이지가 사이트의 본체입니다. 하나라도 빠지면 색인에서 사라지므로
+  // 여기에 전부 적어 둡니다. 계산기를 새로 만들면 이 목록에 추가하세요.
+  const calculators = ['salary', 'severance', 'hourly', 'loan', 'rent', 'area'];
+
   const staticUrls = [
     { loc: `${config.origin}/`, priority: '1.0', changefreq: 'weekly' },
-    { loc: `${config.origin}/salary.html`, priority: '0.9', changefreq: 'monthly' },
+    ...calculators.map((c) => ({
+      loc: `${config.origin}/${c}.html`,
+      priority: '0.9',
+      changefreq: 'monthly',
+    })),
     { loc: `${config.origin}/guides.html`, priority: '0.8', changefreq: 'weekly' },
+    { loc: `${config.origin}/privacy.html`, priority: '0.3', changefreq: 'yearly' },
   ];
   const postUrls = posts.map((p) => ({
     loc: encodeURI(`${config.origin}/posts/${p.slug}.html`),

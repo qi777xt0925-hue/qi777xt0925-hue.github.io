@@ -31,7 +31,8 @@ const posts = topics
 fs.writeFileSync(path.join(SITE, 'guides.html'), renderIndexPage(posts, config), 'utf8');
 
 // ── sitemap.xml ─────────────────────────────────────────────
-fs.writeFileSync(path.join(SITE, 'sitemap.xml'), renderSitemap(posts, config), 'utf8');
+const sitemap = renderSitemap(posts, config);
+fs.writeFileSync(path.join(SITE, 'sitemap.xml'), sitemap, 'utf8');
 
 // ── robots.txt ──────────────────────────────────────────────
 fs.writeFileSync(
@@ -75,7 +76,7 @@ ${latest
   console.warn(`! index.html에 ${START} / ${END} 주석이 없어 최신 글 영역을 건너뛰었습니다.`);
 }
 
-console.log(`빌드 완료 — 글 ${posts.length}편, sitemap ${posts.length + 3}개 URL`);
+console.log(`빌드 완료 — 글 ${posts.length}편, sitemap ${(sitemap.match(/<url>/g) ?? []).length}개 URL`);
 if (config.origin.includes('example.com')) {
   console.warn('! site.config.json의 origin이 아직 example.com입니다. 실제 도메인으로 바꾸세요.');
 }
