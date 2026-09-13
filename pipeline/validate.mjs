@@ -173,7 +173,10 @@ async function checkSources(html, rep) {
     try {
       const ctl = AbortSignal.timeout(12000);
       let res = await fetch(u, { method: 'HEAD', redirect: 'follow', signal: ctl });
-      if (res.status === 405 || res.status === 403 || res.status === 501) {
+      // HEAD를 제대로 처리하지 않는 서버가 많습니다. 국세청은 HEAD에 400을 돌려주면서도
+      // GET에는 200을 줍니다. 그래서 4xx가 나오면 한 번은 GET으로 다시 물어봅니다.
+      // 404처럼 진짜 없는 주소는 GET에서도 404가 나오므로 걸러집니다.
+      if (res.status >= 400 && res.status < 500) {
         res = await fetch(u, { method: 'GET', redirect: 'follow', signal: AbortSignal.timeout(12000) });
       }
       if (res.status >= 400) dead.push(`${u} (HTTP ${res.status})`);
