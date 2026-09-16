@@ -199,7 +199,7 @@ ${renderMorePosts(others)}
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
     요율과 제도는 변경될 수 있으니 최종 확인은 관계 기관 공식 자료를 따르세요.
-    <br>최종 수정: ${esc(lastmod)} · <a href="../privacy.html">개인정보처리방침</a>
+    <br>최종 수정: ${esc(lastmod)} · <a href="../about.html">사이트 소개</a> · <a href="../privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
@@ -258,7 +258,7 @@ ${items}
 <footer class="site">
   <div class="wrap">
     ${esc(config.siteName)} · 참고용 자료이며 법적·세무적 판단의 근거로 사용할 수 없습니다.
-    <br><a href="privacy.html">개인정보처리방침</a>
+    <br><a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a>
   </div>
 </footer>
 </body>
@@ -282,12 +282,12 @@ export function renderSitemap(posts, config, pages = []) {
     ...pages
       .filter((f) => !skip(f) && f !== 'index.html' && f !== 'guides.html')
       .sort()
-      .map((f) =>
-        f === 'privacy.html'
-          ? { loc: `${config.origin}/${f}`, priority: '0.3', changefreq: 'yearly' }
-          : // 계산기가 이 사이트의 본체이므로 가장 높게 둡니다.
-            { loc: `${config.origin}/${f}`, priority: '0.9', changefreq: 'monthly' }
-      ),
+      .map((f) => {
+        // 계산기가 이 사이트의 본체이므로 가장 높게 두고, 안내 문서는 낮춥니다.
+        if (f === 'privacy.html') return { loc: `${config.origin}/${f}`, priority: '0.3', changefreq: 'yearly' };
+        if (f === 'about.html') return { loc: `${config.origin}/${f}`, priority: '0.5', changefreq: 'yearly' };
+        return { loc: `${config.origin}/${f}`, priority: '0.9', changefreq: 'monthly' };
+      }),
   ];
   const postUrls = posts.map((p) => ({
     loc: encodeURI(`${config.origin}/posts/${p.slug}.html`),
