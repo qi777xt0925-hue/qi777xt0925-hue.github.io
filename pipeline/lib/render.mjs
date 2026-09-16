@@ -167,7 +167,7 @@ export function renderPost(article, topic, config, date, others = [], modified =
 <script type="application/ld+json">${jsonLd}</script>
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="${FAVICON}">
-<!-- 애드센스 승인 후 이 자리에 스크립트 한 줄 붙이면 됩니다 -->
+<!-- SCRIPTS:START --><!-- SCRIPTS:END -->
 </head>
 <body>
 
@@ -234,6 +234,7 @@ export function renderIndexPage(posts, config) {
 <meta property="og:locale" content="ko_KR">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="${FAVICON}">
+<!-- SCRIPTS:START --><!-- SCRIPTS:END -->
 </head>
 <body>
 
