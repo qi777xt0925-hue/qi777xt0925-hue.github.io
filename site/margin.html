@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>마진 계산기 | 부가세·판매수수료 빼고 진짜 남는 돈 - 계산기랩</title>
+<meta name="description" content="판매가와 원가, 수수료율을 넣으면 부가세와 수수료를 빼고 실제로 남는 돈이 나옵니다. 손익분기 판매가와 목표 마진율에 맞는 가격까지 함께 계산합니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/margin.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="마진 계산기 | 부가세·수수료 빼고 진짜 남는 돈">
+<meta property="og:description" content="정산액이 아니라 순이익을 봅니다. 손익분기 판매가와 목표 마진 가격까지.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- SCRIPTS:START -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WDJ3WX61V6"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-WDJ3WX61V6');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5824419927261947" crossorigin="anonymous"></script>
+<!-- SCRIPTS:END -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>마진 계산기</h1>
+  <p class="lead">판매가에서 수수료만 빼고 남았다고 보면 <strong>부가세만큼 어긋납니다.</strong> 받은 부가세는 내 돈이 아니라 맡아 둔 돈이기 때문입니다. 여기서는 그것까지 걷어낸 <strong>진짜 남는 돈</strong>을 봅니다.</p>
+
+  <section class="card">
+    <div class="field">
+      <label>과세 유형</label>
+      <div class="seg" id="typeSeg">
+        <button type="button" data-t="general" aria-pressed="true">일반과세자</button>
+        <button type="button" data-t="simple" aria-pressed="false">간이과세·면세</button>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="price">판매가 <span class="hint">고객이 내는 금액</span></label>
+        <div class="inputrow">
+          <input type="text" id="price" inputmode="numeric" value="30,000">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cost">매입원가 <span class="hint">내가 낸 금액</span></label>
+        <div class="inputrow">
+          <input type="text" id="cost" inputmode="numeric" value="15,000">
+          <span class="unit">원</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="fee">판매수수료율 <span class="hint">판매가 기준 · 카드·플랫폼·배달</span></label>
+      <div class="inputrow">
+        <input type="number" id="fee" inputmode="decimal" value="6" min="0" max="80" step="0.1"
+               style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+        <span class="unit">%</span>
+      </div>
+      <div class="chips" id="feeChips"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label for="ship">내가 부담하는 배송비</label>
+        <div class="inputrow">
+          <input type="text" id="ship" inputmode="numeric" value="3,000">
+          <span class="unit">원</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="etc">기타 비용 <span class="hint">포장·부자재</span></label>
+        <div class="inputrow">
+          <input type="text" id="etc" inputmode="numeric" value="500">
+          <span class="unit">원</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap">한 건 팔면 실제로 남는 돈</div>
+    <div class="big" id="profit">–</div>
+    <div class="sub" id="sub">–</div>
+  </section>
+
+  <div class="note" id="warn" style="display:none"></div>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>돈이 어디로 가나</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody id="flow"></tbody>
+    </table>
+  </div>
+
+  <h2>부가세 정리</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody id="vat"></tbody>
+    </table>
+    <div class="note" id="vatNote" style="margin-bottom:0"></div>
+  </div>
+
+  <h2>가격을 얼마로 매겨야 하나</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>손익분기 판매가 <span class="hint">이보다 싸면 손해</span></th><td id="r-be">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>목표 마진율</th><th>판매가</th><th>남는 돈</th></tr></thead>
+      <tbody id="target"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>자주 틀리는 세 가지</h2>
+
+  <h3>정산액은 이익이 아닙니다</h3>
+  <p>플랫폼에서 입금되는 금액은 <strong>판매가에서 수수료만 뺀 돈</strong>입니다. 여기에는 고객에게 받은 부가세가 아직 들어 있고, 원가도 빠지지 않았습니다. 입금액을 이익으로 착각하면 부가세 신고 때 낼 돈이 없습니다.</p>
+
+  <h3>수수료에도 부가세가 붙습니다</h3>
+  <p>수수료율이 6퍼센트라면 실제로 빠지는 돈은 <strong>판매가의 6.6퍼센트</strong>입니다. 수수료 청구서에 부가세가 붙기 때문입니다. 대신 일반과세자는 이 부가세를 <strong>매입세액으로 공제</strong>받으므로 완전히 손해는 아닙니다.</p>
+
+  <h3>매입에 세금계산서가 없으면 공제가 안 됩니다</h3>
+  <p>이 계산기는 매입·배송·기타 비용 모두 <strong>세금계산서나 신용카드 매출전표를 받았다고 전제</strong>합니다. 간이영수증이나 현금 거래로 증빙이 없으면 매입세액 공제를 받지 못해 실제 이익은 계산보다 줄어듭니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>마진율은 판매가 기준인가요, 원가 기준인가요?</summary>
+    <div class="body">이 계산기는 <strong>판매가(공급가액) 기준</strong>입니다. 남는 돈을 공급가액으로 나눈 값입니다. 원가 기준으로 계산하는 방식(마크업)은 같은 조건에서 더 큰 숫자가 나오므로, 다른 자료와 비교할 때는 어느 기준인지부터 확인하세요.</div>
+  </details>
+  <details>
+    <summary>간이과세자면 부가세를 아예 안 내나요?</summary>
+    <div class="body">연 매출 4,800만원 미만이면 납부의무가 면제되지만, 그 위 구간의 간이과세자는 <strong>업종별 부가율을 적용한 세액</strong>을 냅니다. 이 계산기의 '간이과세·면세' 모드는 부가세를 아예 빼고 총액으로만 계산하므로, 실제 이익은 그만큼 조금 더 줄어듭니다.</div>
+  </details>
+  <details>
+    <summary>배달앱 수수료는 몇 퍼센트로 넣어야 하나요?</summary>
+    <div class="body">중개수수료 외에 결제수수료와 배달비가 따로 붙는 구조라 앱과 요금제마다 다릅니다. 정산 내역서에서 <strong>총 공제액 ÷ 주문금액</strong>을 계산해 그 값을 넣는 것이 가장 정확합니다.</div>
+  </details>
+  <details>
+    <summary>인건비와 임대료는 왜 없나요?</summary>
+    <div class="body">이 계산기는 <strong>한 건을 팔 때의 마진</strong>을 봅니다. 인건비와 임대료는 판매 건수와 무관하게 나가는 고정비라 따로 봐야 합니다. 월 고정비를 건당 남는 돈으로 나누면 한 달에 몇 건을 팔아야 본전인지 나옵니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    부가가치세율 10퍼센트를 적용했습니다. 입력하는 금액은 모두 <strong>부가세가 포함된 실제 주고받는 금액</strong>으로 봅니다.
+    일반과세자 모드는 매입·배송·기타 비용과 판매수수료의 부가세를 모두 매입세액으로 공제할 수 있다고 전제합니다(적격 증빙이 있어야 합니다).
+    간이과세·면세 모드는 부가세를 분리하지 않고 총액으로 계산하므로, 업종별 부가율에 따른 납부세액이 있는 간이과세자는 실제 이익이 조금 더 적습니다.
+    인건비·임대료 같은 고정비와 반품·폐기 손실은 반영하지 않았습니다.
+    참고용 자료이며 세무 판단의 근거로 사용할 수 없습니다.
+  </div>
+
+  <h2>함께 보면 좋은 계산기</h2>
+  <div class="list">
+    <a class="item" href="insurance.html">
+      <div class="t">4대보험 계산기</div>
+      <div class="d">직원 한 명에 드는 총 인건비를 고정비에 넣으세요</div>
+    </a>
+    <a class="item" href="loan.html">
+      <div class="t">대출 이자 계산기</div>
+      <div class="d">원리금균등·원금균등·만기일시를 한 화면에서 비교</div>
+    </a>
+    <a class="item" href="hourly.html">
+      <div class="t">시급 · 주휴수당 계산기</div>
+      <div class="d">알바 급여를 정할 때 주휴수당부터 확인하세요</div>
+    </a>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 부가가치세율 10% 기준 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"마진 계산기 (부가세·판매수수료 포함)","applicationCategory":"BusinessApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"판매가·원가·수수료율로 부가세와 수수료를 걷어낸 실제 순이익과 손익분기 판매가를 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"판매수수료 6%면 실제로 얼마가 빠지나요?","acceptedAnswer":{"@type":"Answer","text":"수수료 청구서에 부가세가 붙으므로 판매가의 6.6%가 빠집니다. 다만 일반과세자는 이 부가세를 매입세액으로 공제받습니다."}},
+{"@type":"Question","name":"플랫폼 정산액이 곧 이익인가요?","acceptedAnswer":{"@type":"Answer","text":"아닙니다. 정산액은 판매가에서 수수료만 뺀 금액이라 고객에게 받은 부가세가 그대로 들어 있고 원가도 빠지지 않았습니다. 정산액을 이익으로 보면 부가세 신고 때 낼 돈이 부족해집니다."}},
+{"@type":"Question","name":"마진율은 판매가 기준인가요 원가 기준인가요?","acceptedAnswer":{"@type":"Answer","text":"이 계산기는 판매가(공급가액) 기준입니다. 남는 돈을 공급가액으로 나눈 값이며, 원가 기준 마크업은 같은 조건에서 더 큰 값이 나옵니다."}}]}
+</script>
+
+<script src="assets/margin2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const price = $('price'), cost = $('cost'), fee = $('fee'), ship = $('ship'), etc = $('etc');
+  let general = true;
+
+  [[0,'없음'],[3.3,'카드 3.3%'],[6,'스마트스토어 6%'],[12,'오픈마켓 12%'],[30,'배달앱 30%']]
+    .forEach(function(c){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip'; b.textContent = c[1];
+      b.addEventListener('click', function(){ fee.value = c[0]; render(); });
+      $('feeChips').appendChild(b);
+    });
+
+  Array.prototype.forEach.call($('typeSeg').querySelectorAll('button'), function(b){
+    b.addEventListener('click', function(){
+      general = b.dataset.t === 'general';
+      Array.prototype.forEach.call($('typeSeg').querySelectorAll('button'), function(x){
+        x.setAttribute('aria-pressed', String(x === b));
+      });
+      render();
+    });
+  });
+
+  function opts(p){
+    return {
+      price: p == null ? numOf(price) : p,
+      cost: numOf(cost),
+      feeRate: (Number(fee.value) || 0) / 100,
+      ship: numOf(ship),
+      etc: numOf(etc),
+      general: general
+    };
+  }
+
+  function row(label, value, cls, hint){
+    return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><th>' + label +
+      (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</th><td>' + value + '</td></tr>';
+  }
+
+  function render(){
+    const o = opts();
+    const r = marginOf(o);
+
+    $('profit').textContent = won(r.profit) + '원';
+    $('sub').textContent = '마진율 ' + pct(r.marginRate) + ' · 정산 입금액 ' + won(r.settled) + '원';
+
+    const warn = $('warn');
+    if (r.profit < 0){
+      warn.style.display = 'block';
+      warn.innerHTML = '<strong>한 건 팔 때마다 ' + won(-r.profit) +
+        '원씩 손해입니다.</strong> 손익분기 판매가는 ' + won(r.breakEvenPrice) + '원입니다.';
+    } else if (numOf(price) > 0 && r.marginRate < 0.1){
+      warn.style.display = 'block';
+      warn.innerHTML = '마진율이 <strong>' + pct(r.marginRate) +
+        '</strong>입니다. 반품 한 건이면 여러 건의 이익이 날아가는 구간입니다.';
+    } else {
+      warn.style.display = 'none';
+    }
+
+    const flow = [];
+    flow.push(row('판매가', won(r.price) + '원', 'head'));
+    flow.push(row('ㄴ 판매수수료', '-' + won(r.feeTotal) + '원',
+      'neg', '수수료 ' + won(r.feeSupply) + ' + 부가세 ' + won(r.feeVat)));
+    flow.push(row('정산 입금액', won(r.settled) + '원', 'head'));
+    flow.push(row('ㄴ 매입원가', '-' + won(r.cost) + '원', 'neg'));
+    if (r.ship) flow.push(row('ㄴ 배송비', '-' + won(r.ship) + '원', 'neg'));
+    if (r.etc)  flow.push(row('ㄴ 기타 비용', '-' + won(r.etc) + '원', 'neg'));
+    if (r.general) flow.push(row('ㄴ 납부할 부가세', '-' + won(r.vatDue) + '원', 'neg'));
+    flow.push(row('남는 돈', won(r.profit) + '원', 'tot'));
+    $('flow').innerHTML = flow.join('');
+
+    if (r.general){
+      $('vat').innerHTML = [
+        row('매출세액', won(r.vatOut) + '원', 'head', '판매가에 들어 있던 부가세'),
+        row('ㄴ 매입세액 공제', '-' + won(r.vatIn) + '원', 'neg', '원가·배송·수수료의 부가세'),
+        row('납부할 부가세', won(r.vatDue) + '원', 'tot')
+      ].join('');
+      $('vatNote').innerHTML = '판매가 ' + won(r.price) + '원 중 공급가액은 <strong>' +
+        won(r.supply) + '원</strong>입니다. 나머지 ' + won(r.vatOut) +
+        '원은 맡아 두었다가 신고 때 내는 돈입니다.';
+    } else {
+      $('vat').innerHTML = row('부가세', '계산에서 제외', 'head');
+      $('vatNote').innerHTML = '간이과세·면세 모드입니다. 연 매출 4,800만원 미만이면 납부의무가 면제되지만, ' +
+        '그 위 구간의 간이과세자는 <strong>업종별 부가율에 따른 세액</strong>을 내므로 실제 이익은 이 값보다 조금 적습니다.';
+    }
+
+    $('r-be').textContent = r.breakEvenPrice == null ? '수수료율이 100%를 넘습니다' : won(r.breakEvenPrice) + '원';
+
+    $('target').innerHTML = [0.1, 0.2, 0.3, 0.4, 0.5].map(function(t){
+      const p = priceForMargin(o, t);
+      if (p == null) return '<tr><td>' + pct(t) + '</td><td colspan="2">이 조건에서는 불가능</td></tr>';
+      const m = marginOf(opts(p));
+      return '<tr><td>' + pct(t) + '</td><td>' + won(p) + '원</td><td>' + won(m.profit) + '원</td></tr>';
+    }).join('');
+  }
+
+  [price, cost, ship, etc].forEach(function(el){ attachComma(el, render); });
+  fee.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

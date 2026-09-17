@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>연차 계산기 2026 | 입사일로 보는 연차 개수·소멸일·연차수당 - 계산기랩</title>
+<meta name="description" content="입사일만 넣으면 지금까지 발생한 연차와 남은 일수, 소멸 날짜가 한 번에 나옵니다. 1년 미만 월차 11일과 3년 이상 가산까지 근로기준법 제60조 그대로 계산합니다.">
+<link rel="canonical" href="https://qi777xt0925-hue.github.io/annual-leave.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="연차 계산기 | 입사일로 보는 연차 개수와 소멸일">
+<meta property="og:description" content="1년 미만 월차 11일, 3년 이상 가산, 소멸 시기까지. 근로기준법 제60조 기준.">
+<meta property="og:locale" content="ko_KR">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧮</text></svg>">
+<!-- SCRIPTS:START -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WDJ3WX61V6"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-WDJ3WX61V6');
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5824419927261947" crossorigin="anonymous"></script>
+<!-- SCRIPTS:END -->
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="index.html">계산기<span>랩</span></a>
+    <nav><a href="guides.html">생활 금융 가이드</a><a href="index.html">전체 계산기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>연차 계산기</h1>
+  <p class="lead">입사일과 기준일만 넣으면 <strong>지금까지 발생한 연차</strong>와 <strong>아직 쓸 수 있는 연차</strong>, 그리고 <strong>언제 사라지는지</strong>가 함께 나옵니다.</p>
+
+  <section class="card">
+    <div class="grid2">
+      <div class="field">
+        <label for="hire">입사일</label>
+        <input type="date" id="hire">
+      </div>
+      <div class="field">
+        <label for="asof">기준일 <span class="hint">오늘 또는 마지막 근무일</span></label>
+        <input type="date" id="asof">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="used">이미 사용한 연차 <span class="hint">올해 쓴 일수</span></label>
+      <div class="inputrow">
+        <input type="number" id="used" inputmode="decimal" value="0" min="0" step="0.5"
+               style="border-radius:10px 0 0 10px;text-align:right;font-weight:600">
+        <span class="unit">일</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="pay">월 통상임금 <span class="hint">연차수당 계산용 · 몰라도 됩니다</span></label>
+      <div class="inputrow">
+        <input type="text" id="pay" inputmode="numeric" value="3,000,000">
+        <span class="unit">원</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <div class="cap" id="cap">지금 쓸 수 있는 연차</div>
+    <div class="big" id="live">–</div>
+    <div class="sub" id="sub">–</div>
+  </section>
+
+  <div class="note" id="edge" style="display:none"></div>
+
+  <div class="ad"><!-- 광고 슬롯 1 --></div>
+
+  <h2>정리</h2>
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>근속기간</th><td id="r-tenure">–</td></tr>
+        <tr><th>ㄴ 1년 미만 월차</th><td id="r-month">–</td></tr>
+        <tr><th>ㄴ 1년 이상 연차</th><td id="r-year">–</td></tr>
+        <tr class="head"><th style="padding-top:18px">지금까지 발생한 연차</th><td style="padding-top:18px" id="r-total">–</td></tr>
+        <tr><th>ㄴ 이미 소멸</th><td id="r-dead">–</td></tr>
+        <tr><th>ㄴ 이미 사용</th><td id="r-used">–</td></tr>
+        <tr class="tot"><th>남은 연차</th><td id="r-left">–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <table class="brk">
+      <tbody>
+        <tr class="head"><th>1일 통상임금 <span class="hint">월 통상임금 ÷ 209 × 8</span></th><td id="r-daily">–</td></tr>
+        <tr class="tot"><th>남은 연차를 수당으로 받으면</th><td id="r-allow">–</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-bottom:0">연차수당은 <strong>통상임금</strong> 기준입니다. 통상임금에는 기본급과 고정수당이 들어가고 성과급·상여금은 대체로 빠지므로, 월급 전액을 넣으면 실제보다 크게 나옵니다.</div>
+  </div>
+
+  <h2>연차가 생긴 날과 사라지는 날</h2>
+  <p class="lead" style="margin-bottom:12px">가까운 순서입니다. 회색은 이미 소멸한 연차입니다.</p>
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>시점</th><th>발생일</th><th>일수</th><th>사용기한</th></tr></thead>
+      <tbody id="timeline"></tbody>
+    </table>
+  </div>
+
+  <div class="ad"><!-- 광고 슬롯 2 --></div>
+
+  <h2>연차는 이렇게 쌓입니다</h2>
+
+  <h3>1년 미만이면 한 달에 하루</h3>
+  <p>입사 후 1년이 안 됐다면 <strong>1개월을 개근할 때마다 1일</strong>씩 생깁니다. 최대 11일이고, 이 11일은 모두 <strong>입사 1주년까지</strong> 써야 합니다. 예전에는 입사일로부터 1년이 아니라 각각 발생일로부터 1년이었지만 지금은 아닙니다.</p>
+
+  <h3>1년을 채우면 15일</h3>
+  <p>계속 근로한 기간이 1년이 되고 그 1년간 <strong>80퍼센트 이상 출근</strong>했다면 15일이 생깁니다. 1년 미만일 때 받은 11일과 별개로 생기는 것이라, 입사 후 2년이 안 된 시점에 최대 26일을 받게 됩니다.</p>
+
+  <h3>3년째부터 2년마다 하루씩</h3>
+  <p>계속 근로가 3년 이상이면 15일에 가산이 붙습니다. <strong>3년 16일, 5년 17일, 7년 18일</strong> 하는 식으로 2년마다 하루씩 늘어나고 <strong>25일에서 멈춥니다</strong>. 25일에 도달하는 시점은 계속 근로 21년째입니다.</p>
+
+  <h2>1년 딱 채우고 그만두면 며칠일까</h2>
+  <p>이 질문이 제일 많습니다. 답은 <strong>11일</strong>입니다.</p>
+  <p>15일은 1년의 근로를 마친 <strong>다음 날</strong>에 생깁니다. 그래서 365일만 채우고 그만두면 15일이 발생할 자리가 없고, 1년 미만 기간에 쌓인 11일만 남습니다. <strong>하루를 더 일하면 26일</strong>이 됩니다.</p>
+  <p>기준은 간단합니다. <strong>마지막 근무일이 입사 1주년(입사일과 월·일이 같은 날) 이상이어야</strong> 15일이 생깁니다. 2025년 9월 17일에 입사했다면 2026년 9월 16일까지 일하고 그만둘 때는 11일, 2026년 9월 17일까지 일하면 26일입니다.</p>
+  <p>계산기의 기준일에 <strong>마지막 근무일</strong>을 넣으면 이 차이가 그대로 반영됩니다.</p>
+
+  <h2>자주 묻는 질문</h2>
+  <details>
+    <summary>회사가 회계연도(1월 1일) 기준으로 준다는데 괜찮나요?</summary>
+    <div class="body">관리 편의상 흔히 쓰는 방식이고 그 자체로 위법은 아닙니다. 다만 <strong>퇴직 시점에 입사일 기준으로 다시 계산해서, 그보다 적게 받았다면 차액을 받아야 합니다.</strong> 회계연도 기준은 법이 정한 방식이 아니라 취업규칙으로 정하는 것이라 법정 기준보다 불리할 수 없습니다.</div>
+  </details>
+  <details>
+    <summary>5인 미만 사업장도 연차가 있나요?</summary>
+    <div class="body">없습니다. 연차유급휴가는 <strong>상시 근로자 5인 이상</strong> 사업장에만 적용됩니다. 주휴수당과 최저임금은 규모와 무관하게 적용되지만 연차는 다릅니다.</div>
+  </details>
+  <details>
+    <summary>안 쓴 연차는 무조건 수당으로 받나요?</summary>
+    <div class="body">원칙은 그렇지만, 회사가 <strong>연차사용촉진</strong> 절차를 법대로 밟았다면 미사용 연차의 수당 지급 의무가 사라집니다. 사용 시기를 지정하라고 서면으로 통보받은 적이 있다면 이 절차에 해당할 수 있습니다.</div>
+  </details>
+  <details>
+    <summary>육아휴직이나 병가 기간도 출근한 걸로 보나요?</summary>
+    <div class="body">육아휴직, 업무상 재해로 인한 휴업, 출산전후휴가 기간은 <strong>출근한 것으로 봅니다</strong>. 개인 사정으로 인한 무급휴직은 출근율 계산에서 빠지며, 이 경우 연차가 비례해서 줄어들 수 있습니다. 이 계산기는 개근을 전제로 계산합니다.</div>
+  </details>
+  <details>
+    <summary>주 15시간 미만 단시간 근로자는요?</summary>
+    <div class="body">4주 평균으로 <strong>1주 소정근로시간이 15시간 미만</strong>이면 연차가 발생하지 않습니다. 15시간 이상이면 통상 근로자의 연차에 근로시간을 비례해서 계산합니다.</div>
+  </details>
+
+  <div class="note" style="margin-top:24px">
+    <strong>계산 기준 안내</strong><br>
+    근로기준법 제60조를 기준으로 계산합니다 — 1년 미만 기간은 1개월 개근당 1일(최대 11일, 사용기한은 입사 1주년까지),
+    1년 이상이면 15일, 3년 이상부터 매 2년에 1일씩 가산해 25일이 한도입니다.
+    <strong>모든 기간을 개근하고 출근율 80퍼센트를 넘긴 것으로 전제</strong>했으며, 무급휴직·결근이 있으면 실제 일수는 줄어들 수 있습니다.
+    상시 근로자 5인 미만 사업장에는 적용되지 않습니다.
+    회계연도 기준으로 부여하는 회사는 숫자가 다를 수 있지만, 퇴직 시 입사일 기준보다 적으면 차액을 받아야 합니다.
+    참고용 자료이며 법적 판단의 근거로 사용할 수 없습니다.
+  </div>
+
+  <h2>함께 보면 좋은 계산기</h2>
+  <div class="list">
+    <a class="item" href="severance.html">
+      <div class="t">퇴직금 계산기</div>
+      <div class="d">연차수당은 평균임금에 3/12만큼 들어갑니다</div>
+    </a>
+    <a class="item" href="hourly.html">
+      <div class="t">시급 · 주휴수당 계산기</div>
+      <div class="d">주 15시간이 연차와 주휴수당 양쪽의 갈림길입니다</div>
+    </a>
+    <a class="item" href="insurance.html">
+      <div class="t">4대보험 계산기</div>
+      <div class="d">근로자 공제액과 사업주 부담금을 함께 봅니다</div>
+    </a>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    계산기랩 · 근로기준법 제60조 기준 · <a href="index.html">전체 계산기 보기</a>
+    <br><a href="about.html">사이트 소개</a> · <a href="privacy.html">개인정보처리방침</a>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication",
+"name":"연차 계산기","applicationCategory":"BusinessApplication",
+"operatingSystem":"All","inLanguage":"ko",
+"offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},
+"description":"입사일과 기준일로 발생 연차, 남은 연차, 소멸일과 연차수당을 계산합니다."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"1년 딱 채우고 퇴사하면 연차가 며칠인가요?","acceptedAnswer":{"@type":"Answer","text":"11일입니다. 15일은 1년의 근로를 마친 다음 날에 발생하므로, 1년이 되는 날까지만 일하고 그만두면 1년 미만 기간에 쌓인 11일만 남습니다. 하루를 더 일하면 11일에 15일이 더해져 26일이 됩니다."}},
+{"@type":"Question","name":"3년 이상 근무하면 연차가 며칠인가요?","acceptedAnswer":{"@type":"Answer","text":"계속 근로 3년이면 16일이고, 이후 2년마다 1일씩 늘어 5년 17일, 7년 18일이 됩니다. 한도는 25일이며 계속 근로 21년째에 도달합니다."}},
+{"@type":"Question","name":"1년 미만 근로자의 연차 사용기한은 언제까지인가요?","acceptedAnswer":{"@type":"Answer","text":"1개월 개근마다 1일씩 최대 11일이 생기며, 이 11일은 모두 입사 1주년이 되는 날까지 사용해야 합니다."}},
+{"@type":"Question","name":"5인 미만 사업장도 연차가 발생하나요?","acceptedAnswer":{"@type":"Answer","text":"발생하지 않습니다. 연차유급휴가는 상시 근로자 5인 이상 사업장에 적용됩니다. 주휴수당과 최저임금은 사업장 규모와 무관하게 적용됩니다."}}]}
+</script>
+
+<script src="assets/leave2026.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const hire = $('hire'), asof = $('asof'), used = $('used'), pay = $('pay');
+
+  const today = new Date();
+  asof.value = ymd(today);
+  hire.value = ymd(new Date(today.getFullYear() - 2, today.getMonth(), 1));
+
+  function parse(el){
+    const v = el.value;
+    if (!v) return null;
+    const p = v.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+
+  function render(){
+    const h = parse(hire), a = parse(asof);
+    const r = accrue(h, a);
+
+    if (!r.valid){
+      $('live').textContent = '–';
+      $('sub').textContent = h && a ? '기준일이 입사일보다 빠릅니다' : '입사일과 기준일을 넣어주세요';
+      $('edge').style.display = 'none';
+      $('timeline').innerHTML = '';
+      ['r-tenure','r-month','r-year','r-total','r-dead','r-used','r-left','r-daily','r-allow']
+        .forEach(function(id){ $(id).textContent = '–'; });
+      return;
+    }
+
+    const al = alive(r, a);
+    const usedDays = Math.max(Number(used.value) || 0, 0);
+    const left = Math.max(al.liveDays - usedDays, 0);
+
+    $('live').textContent = left + '일';
+    $('sub').textContent = '지금까지 ' + r.total + '일 발생 · 유효 ' + al.liveDays + '일 · 사용 ' + usedDays + '일';
+
+    // 1년 경계 안내 — 제일 많이 묻는 지점입니다.
+    const edge = $('edge');
+    if (r.years === 0 && r.months >= 1){
+      const need = r.firstAnniv;
+      edge.style.display = 'block';
+      edge.innerHTML = '<strong>' + ko(need) + '</strong>까지 일하면 15일이 더 생겨 <strong>' +
+        (r.total + 15) + '일</strong>이 됩니다. 하루 차이로 15일이 갈립니다 — 15일은 1년의 근로를 마친 <strong>다음 날</strong>에 생기기 때문입니다.';
+    } else if (r.years >= 1 && daysBetween(addYears(h, r.years), a) < 30){
+      edge.style.display = 'block';
+      edge.innerHTML = '기준일이 <strong>만 ' + r.years + '년</strong> 시점 부근입니다. 마지막 근무일이 ' +
+        ko(addYears(h, r.years)) + '보다 하루라도 빠르면 그날 생기는 ' + daysForYear(r.years) +
+        '일은 발생하지 않습니다.';
+    } else {
+      edge.style.display = 'none';
+    }
+
+    // 달력 기준으로 몇 년 몇 개월인지 셉니다. 365로 나누면 윤년만큼 어긋납니다.
+    let ty = a.getFullYear() - h.getFullYear();
+    let tm = a.getMonth() - h.getMonth();
+    if (a.getDate() < h.getDate()) tm--;
+    if (tm < 0){ ty--; tm += 12; }
+    $('r-tenure').textContent = (ty ? ty + '년 ' : '') + tm + '개월 (' + r.tenureDays + '일)';
+    $('r-month').textContent = r.months + '일';
+    $('r-year').textContent = (r.total - r.months) + '일';
+    $('r-total').textContent = r.total + '일';
+    $('r-dead').textContent = '-' + al.deadDays + '일';
+    $('r-used').textContent = '-' + usedDays + '일';
+    $('r-left').textContent = left + '일';
+
+    const money = leaveAllowance(left, numOf(pay));
+    $('r-daily').textContent = won(money.daily) + '원';
+    $('r-allow').textContent = won(money.amount) + '원';
+
+    const rows = r.items.slice().reverse().map(function(i){
+      const dead = i.expire <= a;
+      const style = dead ? ' style="opacity:.45"' : '';
+      const hi = (!dead && i.kind === 'year') ? ' class="hi"' : '';
+      return '<tr' + hi + style + '><td>' + i.label + '</td><td>' + ymd(i.on) + '</td><td>' +
+        i.days + '일</td><td>' + ymd(i.expire) + (dead ? ' (소멸)' : '') + '</td></tr>';
+    });
+    $('timeline').innerHTML = rows.join('');
+  }
+
+  [hire, asof, used].forEach(function(el){ el.addEventListener('input', render); });
+  attachComma(pay, render);
+  render();
+})();
+</script>
+</body>
+</html>
