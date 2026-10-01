@@ -9,6 +9,12 @@ on:
     branches: [main]
     paths: ['site/**']
   workflow_dispatch:
+    inputs:
+      all:
+        description: '바뀐 것만 말고 사이트 전체를 통보'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -26,13 +32,24 @@ jobs:
         env:
           INDEXNOW_KEY: 77088601589f5d3daae39f8ac9c025ac
           SITE_HOST: qi777xt0925-hue.github.io
+          ALL: ${{ github.event.inputs.all }}
         run: |
           set -u
 
-          # 이번 커밋에서 바뀐 site/ 아래 html 을 찾습니다.
-          # git pathspec 의 ** 는 의도대로 동작하지 않아 grep 으로 거릅니다.
-          CHANGED=$(git diff --name-only --diff-filter=d HEAD~1 HEAD -- site || true)
-          PAGES=$(printf '%s\n' "$CHANGED" | grep -E '[.]html$' || true)
+          # 직전 커밋만 보는 방식은 통보를 놓치면 영영 복구되지 않습니다.
+          # 2026-09-28 발행 글이 실제로 그랬습니다 — 배포 트리거가 막혀 이 워크플로가
+          # 아예 돌지 않았고, 나중에 돌렸을 땐 이미 HEAD가 넘어가 "바뀐 것 없음"이 됐습니다.
+          # all 입력을 켜면 사이트맵의 모든 주소를 다시 통보해 그런 구멍을 메웁니다.
+          if [ "$ALL" = "true" ]; then
+            echo "사이트 전체를 통보합니다."
+            PAGES=$(find site -name '*.html' \
+                    ! -name 'google*' ! -name 'naver*' | sort)
+          else
+            # 이번 커밋에서 바뀐 site/ 아래 html 을 찾습니다.
+            # git pathspec 의 ** 는 의도대로 동작하지 않아 grep 으로 거릅니다.
+            CHANGED=$(git diff --name-only --diff-filter=d HEAD~1 HEAD -- site || true)
+            PAGES=$(printf '%s\n' "$CHANGED" | grep -E '[.]html$' || true)
+          fi
 
           if [ -z "$PAGES" ]; then
             echo "바뀐 페이지가 없어 통보하지 않습니다."
