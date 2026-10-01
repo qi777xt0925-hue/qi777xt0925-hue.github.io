@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderIndexPage, renderSitemap, esc } from './lib/render.mjs';
+import { renderIndexPage, renderSitemap, renderSitemapIndex, esc } from './lib/render.mjs';
 import { readJson } from './lib/json.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -36,10 +36,13 @@ const pages = fs.readdirSync(SITE).filter((f) => f.endsWith('.html'));
 const sitemap = renderSitemap(posts, config, pages);
 fs.writeFileSync(path.join(SITE, 'sitemap.xml'), sitemap, 'utf8');
 
+// 사이트맵 인덱스. 서치콘솔에 제출할 주소는 이쪽입니다 — 이유는 render.mjs 주석 참고.
+fs.writeFileSync(path.join(SITE, 'sitemap-index.xml'), renderSitemapIndex(config), 'utf8');
+
 // ── robots.txt ──────────────────────────────────────────────
 fs.writeFileSync(
   path.join(SITE, 'robots.txt'),
-  `User-agent: *\nAllow: /\n\nSitemap: ${config.origin}/sitemap.xml\n`,
+  `User-agent: *\nAllow: /\n\nSitemap: ${config.origin}/sitemap-index.xml\nSitemap: ${config.origin}/sitemap.xml\n`,
   'utf8'
 );
 

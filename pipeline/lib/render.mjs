@@ -272,6 +272,25 @@ ${items}
  * @param {string[]} pages site/ 바로 아래의 .html 파일명 목록. 계산기를 새로 만들어도
  *                         이 목록에서 자동으로 잡히므로 여기를 손으로 고칠 일이 없습니다.
  */
+/**
+ * 사이트맵 인덱스. 사이트맵 하나를 가리킬 뿐이지만 주소가 다릅니다.
+ *
+ * 서치콘솔에 /sitemap.xml 을 제출했는데 「가져올 수 없음」으로 굳어버리는 일이 있습니다.
+ * 소유권 확인 전에 제출하면 그 실패 상태가 남고, 같은 주소로 다시 제출해도 재시도되지
+ * 않습니다(2026-09-26 재제출 후 5일이 지나도 "마지막으로 읽은 날짜"가 비어 있었습니다).
+ * 서치콘솔에는 사이트맵을 지우는 기능이 없으므로, 이력이 없는 새 주소로 제출해야 합니다.
+ */
+export function renderSitemapIndex(config) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${esc(config.origin)}/sitemap.xml</loc>
+    <lastmod>${new Date().toISOString().slice(0, 10)}</lastmod>
+  </sitemap>
+</sitemapindex>
+`;
+}
+
 export function renderSitemap(posts, config, pages = []) {
   // 검색엔진 소유확인용 파일만 뺍니다. 개인정보처리방침은 우선순위를 낮춰 넣어 둡니다 —
   // 애드센스 심사에서 보는 페이지라 색인돼 있는 편이 낫습니다.
