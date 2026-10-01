@@ -51,6 +51,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  actions: write # 푸시 뒤에 배포·색인 통보를 직접 불러야 합니다 (맨 아래 단계 참고)
 
 concurrency:
   group: publish
@@ -234,9 +235,31 @@ jobs:
           git push
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.diff.outputs.posts }}" = "true" ]; then
-            echo "**검수를 통과해 main에 발행했습니다.** 배포와 색인 통보가 이어서 돌아갑니다." >> "$GITHUB_STEP_SUMMARY"
+            echo "**검수를 통과해 main에 발행했습니다.**" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "발행할 글은 없었고, 주제 큐 보충 결과만 저장했습니다." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # GitHub은 GITHUB_TOKEN으로 만든 푸시에서는 다른 워크플로를 실행하지 않습니다.
+      # 워크플로가 서로를 끝없이 부르는 것을 막기 위한 장치입니다.
+      # 그래서 push 트리거만 걸린 배포·색인 통보는 자동 발행 뒤에 영영 돌지 않습니다.
+      #
+      # 2026-09-28 발행에서 실제로 이 일이 났습니다. 글은 커밋됐는데 사이트에는
+      # 올라가지 않았고, 아무도 알아채지 못한 채 사흘이 지났습니다.
+      # 두 워크플로 모두 workflow_dispatch를 갖고 있으므로 여기서 직접 부릅니다.
+      - name: 배포·색인 통보 실행
+        if: steps.diff.outputs.posts == 'true' && steps.preflight.outputs.mode == 'direct'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ok=1
+          gh workflow run pages.yml   --ref "${{ github.ref_name }}" || ok=0
+          gh workflow run indexnow.yml --ref "${{ github.ref_name }}" || ok=0
+          if [ "$ok" -eq 1 ]; then
+            echo "배포와 색인 통보를 실행했습니다." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::배포 또는 색인 통보를 실행하지 못했습니다. Actions 탭에서 '사이트 배포'를 수동으로 실행하세요."
+            echo "**배포를 자동으로 걸지 못했습니다.** Actions 탭에서 \`사이트 배포\`를 수동 실행해 주세요." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       # PR 생성이 막혀 있어도 브랜치는 남기고, 수동으로 열 수 있는 링크를 띄웁니다.
