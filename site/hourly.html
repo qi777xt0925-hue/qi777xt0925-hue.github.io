@@ -60,8 +60,8 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <section class="result" aria-live="polite">
     <div class="cap">주휴수당 (월)</div>
-    <div class="big" id="holiday">–</div>
-    <div class="sub" id="sub">–</div>
+    <div class="big" id="holiday">175,440원</div>
+    <div class="sub" id="sub">주 41,280원 · 연 2,146,560원</div>
     <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
   </section>
 
@@ -71,13 +71,13 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card">
     <table class="brk">
       <tbody>
-        <tr class="head"><th>주급</th><td id="r-week">–</td></tr>
-        <tr><th>ㄴ 일한 시간분</th><td id="r-weekwork">–</td></tr>
-        <tr><th>ㄴ 주휴수당</th><td id="r-weekhol">–</td></tr>
-        <tr class="head"><th style="padding-top:18px">월급 <span class="hint">월 4.345주 환산</span></th><td style="padding-top:18px" id="r-month">–</td></tr>
-        <tr><th>ㄴ 일한 시간분</th><td id="r-monthwork">–</td></tr>
-        <tr><th>ㄴ 주휴수당</th><td id="r-monthhol">–</td></tr>
-        <tr class="tot"><th>연 환산</th><td id="r-year">–</td></tr>
+        <tr class="head"><th>주급</th><td id="r-week">247,680원</td></tr>
+        <tr><th>ㄴ 일한 시간분</th><td id="r-weekwork">206,400원</td></tr>
+        <tr><th>ㄴ 주휴수당</th><td id="r-weekhol">41,280원</td></tr>
+        <tr class="head"><th style="padding-top:18px">월급 <span class="hint">월 4.345주 환산</span></th><td style="padding-top:18px" id="r-month">1,073,280원</td></tr>
+        <tr><th>ㄴ 일한 시간분</th><td id="r-monthwork">897,840원</td></tr>
+        <tr><th>ㄴ 주휴수당</th><td id="r-monthhol">175,440원</td></tr>
+        <tr class="tot"><th>연 환산</th><td id="r-year">12,879,360원</td></tr>
       </tbody>
     </table>
   </div>
@@ -91,7 +91,7 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>주 근로시간</th><th>주휴수당(주)</th><th>주휴수당(월)</th><th>월급 합계</th></tr></thead>
-      <tbody id="cmp"></tbody>
+      <tbody id="cmp"><tr><td>14시간</td><td>0</td><td>0</td><td>629,520</td></tr><tr><td>15시간</td><td>30,960</td><td>134,160</td><td>804,960</td></tr><tr class="hi"><td>20시간</td><td>41,280</td><td>175,440</td><td>1,073,280</td></tr><tr><td>25시간</td><td>51,600</td><td>227,040</td><td>1,351,920</td></tr><tr><td>30시간</td><td>61,920</td><td>268,320</td><td>1,609,920</td></tr><tr><td>35시간</td><td>72,240</td><td>309,600</td><td>1,878,240</td></tr><tr><td>40시간</td><td>82,560</td><td>361,200</td><td>2,156,880</td></tr></tbody>
     </table>
   </div>
 
@@ -108,6 +108,28 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <h3>월급쟁이도 이미 받고 있습니다</h3>
   <p>월급을 시급으로 환산할 때 174가 아니라 <strong>209로 나누는 이유</strong>가 주휴수당입니다. 주 40시간이면 실제 근로가 월 174시간인데, 여기에 주휴 35시간이 더해져 209시간이 됩니다.</p>
+
+  <!-- PRE:hourly-extra:START -->
+  <h2>주급에 4.345를 곱하면 왜 월급과 안 맞을까</h2>
+  <p>2026년 최저시급 10,320원으로 주 40시간 일하면 주휴수당을 포함한 주급은 495,360원입니다. 한 달을 4.345주로 보고 곱하면 <strong>2,152,339원</strong>이 나옵니다. 그런데 정부가 공표하는 최저 월급은 <strong>2,156,880원</strong>(시급 × 209시간)입니다. 4,541원이 차이 납니다.</p>
+  <p>209시간은 주 48시간(근로 40 + 주휴 8)에 4.345를 곱한 208.56시간을 <strong>먼저 반올림한 값</strong>입니다. 시간을 반올림한 뒤 시급을 곱하느냐, 돈에 4.345를 곱하느냐의 차이입니다. 월급 계약서와 맞추려면 시간을 먼저 반올림해야 하고, 이 계산기도 그렇게 계산합니다.</p>
+  <h3>최저시급으로 주 몇 시간 일하면 한 달에 얼마</h3>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>주 소정근로시간</th><th>월 주휴수당</th><th>월 급여 (주휴 포함)</th></tr></thead>
+      <tbody>
+        <tr><td>14시간</td><td>없음</td><td>629,520원</td></tr>
+        <tr><td>15시간</td><td>134,160원</td><td>804,960원</td></tr>
+        <tr><td>20시간</td><td>175,440원</td><td>1,073,280원</td></tr>
+        <tr><td>25시간</td><td>227,040원</td><td>1,351,920원</td></tr>
+        <tr><td>30시간</td><td>268,320원</td><td>1,609,920원</td></tr>
+        <tr><td>40시간</td><td>361,200원</td><td>2,156,880원</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>주 14시간과 15시간은 한 시간 차이지만 월 급여는 629,520원과 804,960원으로 <strong>175,440원</strong> 벌어집니다. 15시간부터 주휴수당이 붙기 때문입니다.</p>
+<!-- PRE:hourly-extra:END -->
 
   <h2>자주 묻는 질문</h2>
   <details>

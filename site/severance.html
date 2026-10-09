@@ -78,8 +78,8 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <section class="result" aria-live="polite">
     <div class="cap">예상 퇴직금 (세전)</div>
-    <div class="big" id="amount">–</div>
-    <div class="sub" id="sub">–</div>
+    <div class="big" id="amount">9,008,219원</div>
+    <div class="sub" id="sub">근속 3.0년 · 세후 8,902,419원</div>
     <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
   </section>
 
@@ -89,20 +89,20 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card">
     <table class="brk">
       <tbody>
-        <tr class="head"><th>재직일수</th><td id="r-days">–</td></tr>
-        <tr><th>ㄴ 근속연수 <span class="hint">세금 계산용 · 1년 미만은 올림</span></th><td id="r-years">–</td></tr>
-        <tr><th>평균임금 산정기간</th><td id="r-period">–</td></tr>
-        <tr><th>1일 평균임금</th><td id="r-daily">–</td></tr>
-        <tr class="head"><th style="padding-top:18px">퇴직금</th><td style="padding-top:18px" id="r-amount">–</td></tr>
-        <tr class="neg"><th>퇴직소득세</th><td id="r-tax">–</td></tr>
-        <tr class="neg"><th>지방소득세 (소득세의 10%)</th><td id="r-local">–</td></tr>
-        <tr class="tot"><th>세후 실수령액</th><td id="r-net">–</td></tr>
+        <tr class="head"><th>재직일수</th><td id="r-days">1,096일</td></tr>
+        <tr><th>ㄴ 근속연수 <span class="hint">세금 계산용 · 1년 미만은 올림</span></th><td id="r-years">3년</td></tr>
+        <tr><th>평균임금 산정기간</th><td id="r-period">90일</td></tr>
+        <tr><th>1일 평균임금</th><td id="r-daily">100,000원</td></tr>
+        <tr class="head"><th style="padding-top:18px">퇴직금</th><td style="padding-top:18px" id="r-amount">9,008,219원</td></tr>
+        <tr class="neg"><th>퇴직소득세</th><td id="r-tax">-96,190원</td></tr>
+        <tr class="neg"><th>지방소득세 (소득세의 10%)</th><td id="r-local">-9,610원</td></tr>
+        <tr class="tot"><th>세후 실수령액</th><td id="r-net">8,902,419원</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="note">
-    퇴직소득세 실효세율은 <strong id="r-rate">–</strong>입니다. 퇴직소득세는 근속연수가 길수록 공제가 커져 세율이 낮아집니다.
+    퇴직소득세 실효세율은 <strong id="r-rate">1.17%</strong>입니다. 퇴직소득세는 근속연수가 길수록 공제가 커져 세율이 낮아집니다.
   </div>
 
   <h2>근속연수별 퇴직금</h2>
@@ -110,7 +110,7 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>근속</th><th>퇴직금</th><th>퇴직소득세</th><th>세후 실수령</th></tr></thead>
-      <tbody id="cmp"></tbody>
+      <tbody id="cmp"><tr><td>1년</td><td>3,000,000</td><td>35,200</td><td>2,964,800</td></tr><tr><td>2년</td><td>6,000,000</td><td>70,400</td><td>5,929,600</td></tr><tr class="hi"><td>3년</td><td>9,000,000</td><td>105,600</td><td>8,894,400</td></tr><tr><td>5년</td><td>15,000,000</td><td>176,000</td><td>14,824,000</td></tr><tr><td>10년</td><td>30,000,000</td><td>220,000</td><td>29,780,000</td></tr><tr><td>20년</td><td>60,000,000</td><td>176,000</td><td>59,824,000</td></tr></tbody>
     </table>
   </div>
 
@@ -127,6 +127,42 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <h3>3. 퇴직소득세를 뗍니다</h3>
   <p>퇴직소득세는 일반 소득세와 계산 방식이 다릅니다. 오래 쌓인 돈을 한 번에 받는 것이라 세 부담을 낮추는 구조가 들어갑니다. 근속연수공제를 빼고, 12배수로 환산해 환산급여공제를 적용한 뒤 세율을 매기고 다시 근속연수로 되돌립니다. 그래서 <strong>같은 금액이라도 오래 다닌 사람이 세금을 덜 냅니다.</strong></p>
+
+  <!-- PRE:severance-extra:START -->
+  <h2>같은 3년을 일해도 언제 그만두느냐에 따라 다릅니다</h2>
+  <p>월급 3,000,000원으로 딱 3년을 일하고 퇴직한 경우입니다. 근속기간은 같지만, 평균임금을 구할 때 나누는 <strong>직전 3개월의 달력 일수</strong>가 퇴직일마다 달라서 퇴직금도 달라집니다.</p>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>퇴직일</th><th>직전 3개월 일수</th><th>1일 평균임금</th><th>퇴직금</th></tr></thead>
+      <tbody>
+        <tr><td>2026년 3월 1일</td><td>90일</td><td>100,000원</td><td>9,008,219원</td></tr>
+        <tr><td>2026년 6월 1일</td><td>92일</td><td>97,826원</td><td>8,812,388원</td></tr>
+        <tr><td>2026년 9월 1일</td><td>92일</td><td>97,826원</td><td>8,812,388원</td></tr>
+        <tr><td>2026년 12월 1일</td><td>91일</td><td>98,901원</td><td>8,909,228원</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>직전 3개월이 가장 짧은 2026년 3월 1일 퇴직이 9,008,219원으로 가장 많고, 가장 긴 2026년 6월 1일 퇴직이 8,812,388원으로 가장 적습니다. 차이는 195,831원입니다. 같은 석 달 치 월급을 더 적은 일수로 나누면 하루 평균임금이 올라가기 때문입니다.</p>
+  <h3>퇴직소득세는 이렇게 나옵니다 (2026년 3월 1일 퇴직 기준)</h3>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>단계</th><th>계산</th><th>금액</th></tr></thead>
+      <tbody>
+        <tr><td>퇴직금</td><td>위 표 첫 줄</td><td>9,008,219원</td></tr>
+        <tr><td>근속연수공제</td><td>근속 3년 기준</td><td>−3,000,000원</td></tr>
+        <tr><td>환산급여</td><td>(퇴직금 − 근속연수공제) × 12 ÷ 3</td><td>24,032,876원</td></tr>
+        <tr><td>환산급여공제</td><td>환산급여 구간별 공제</td><td>−17,619,726원</td></tr>
+        <tr><td>과세표준</td><td>환산급여 − 환산급여공제</td><td>6,413,150원</td></tr>
+        <tr><td>퇴직소득세</td><td>과세표준에 세율을 곱한 뒤 ÷ 12 × 3</td><td>96,190원</td></tr>
+        <tr><td>지방소득세</td><td>퇴직소득세 × 10%</td><td>9,610원</td></tr>
+        <tr><td>실수령 퇴직금</td><td>퇴직금 − 세금</td><td><strong>8,902,419원</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>퇴직금 9,008,219원에 붙는 세금은 105,800원, 실효세율 1.17%입니다. 같은 돈을 월급으로 받았을 때보다 훨씬 적은데, 여러 해에 걸쳐 쌓인 돈을 1년치로 나눠(환산급여) 세율을 매기기 때문입니다.</p>
+<!-- PRE:severance-extra:END -->
 
   <h2>자주 묻는 질문</h2>
   <details>
@@ -200,7 +236,7 @@ gtag('config', 'G-WDJ3WX61V6');
     return new Date(p[0], p[1] - 1, p[2]);
   }
 
-  function compute(days, periodDays){
+  function compute(days, periodDays, years){
     const monthlyPay = numOf(pay);
     const s = severancePay({
       monthlyPay: monthlyPay,
@@ -210,7 +246,7 @@ gtag('config', 'G-WDJ3WX61V6');
       annualLeave: numOf(leavePay)
     });
     if (!s.eligible) return { s: s, t: null };
-    return { s: s, t: retirementTax(s.amount, days) };
+    return { s: s, t: retirementTax(s.amount, days, years) };
   }
 
   function render(){
@@ -226,7 +262,7 @@ gtag('config', 'G-WDJ3WX61V6');
 
     const days = daysBetween(join, leave);
     const periodDays = averagePeriodDays(leave);
-    const r = compute(days, periodDays);
+    const r = compute(days, periodDays, serviceYears(join, leave));
 
     $('r-days').textContent = won(days) + '일';
     $('r-period').textContent = periodDays + '일';

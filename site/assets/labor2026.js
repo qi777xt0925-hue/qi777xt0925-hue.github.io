@@ -129,8 +129,26 @@ function progressiveTax(base){
   return 0;
 }
 
-function retirementTax(severance, days){
-  const years = Math.max(Math.ceil(days / 365), 1);
+/**
+ * 세금 계산용 근속연수 — 달력으로 센 만 근속연수에, 남는 기간이 있으면 1년을 더합니다.
+ * 재직일수 ÷ 365 를 올림하면 윤년이 낀 딱 3년(1,096일)이 4년이 됩니다.
+ * leave 는 퇴직일(마지막 근무일의 다음 날)입니다.
+ */
+function serviceYears(join, leave){
+  const anniv = n => {
+    const d = new Date(join.getTime());
+    d.setFullYear(join.getFullYear() + n);
+    if (d.getDate() !== join.getDate()) d.setDate(0); // 2/29 입사자는 평년 2/28
+    return d;
+  };
+  let y = 0;
+  while (anniv(y + 1) <= leave) y++;
+  return Math.max(y + (leave > anniv(y) ? 1 : 0), 1);
+}
+
+/** years 를 주면 그 값을 쓰고, 없으면 재직일수로 어림합니다(윤년이 끼면 1년 많게 나올 수 있음). */
+function retirementTax(severance, days, years){
+  years = years || Math.max(Math.ceil(days / 365), 1);
   const yearDed = serviceYearDeduction(years);
   const afterYearDed = Math.max(severance - yearDed, 0);
 

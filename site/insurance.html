@@ -82,8 +82,8 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <section class="result" aria-live="polite">
     <div class="cap">직원 한 명에 드는 총 인건비 (월)</div>
-    <div class="big" id="cost">–</div>
-    <div class="sub" id="costSub">–</div>
+    <div class="big" id="cost">3,321,920원</div>
+    <div class="sub" id="costSub">급여 3,000,000원 + 사업주 부담 321,920원 · 급여 대비 +10.7%</div>
   </section>
 
   <div class="ad"><!-- 광고 슬롯 1 --></div>
@@ -92,19 +92,19 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>항목</th><th>근로자</th><th>사업주</th><th>합계</th></tr></thead>
-      <tbody id="rows"></tbody>
-      <tbody id="tot"></tbody>
+      <tbody id="rows"><tr><td>국민연금</td><td>133,000</td><td>133,000</td><td>266,000</td></tr><tr><td>건강보험</td><td>100,660</td><td>100,660</td><td>201,320</td></tr><tr><td>장기요양보험</td><td>13,220</td><td>13,220</td><td>26,440</td></tr><tr><td>고용보험</td><td>25,200</td><td>25,200</td><td>50,400</td></tr><tr><td>고용안정·직업능력개발</td><td>–</td><td>7,000</td><td>7,000</td></tr><tr><td>산재보험</td><td>–</td><td>42,840</td><td>42,840</td></tr></tbody>
+      <tbody id="tot"><tr class="hi"><td>합계</td><td>272,080</td><td>321,920</td><td>594,000</td></tr></tbody>
     </table>
   </div>
-  <div class="note" id="rowNote"></div>
+  <div class="note" id="rowNote">보수월액 <strong>2,800,000원</strong> 기준 · <strong>국민연금</strong> 기준소득월액 2,800,000원 × 각 4.75% · <strong>건강보험</strong> 보수월액 × 각 3.595% · <strong>장기요양보험</strong> 건강보험료 × 13.14% · <strong>고용보험</strong> 실업급여분 각 0.9% · <strong>고용안정·직업능력개발</strong> 사업주만 부담 · 0.25% · <strong>산재보험</strong> 사업주 전액 · 1.53% (출퇴근재해 0.06% 포함)</div>
 
   <h2>근로자 입장에서</h2>
   <div class="card">
     <table class="brk">
       <tbody>
-        <tr class="head"><th>월 급여</th><td id="r-gross">–</td></tr>
-        <tr class="neg"><th>ㄴ 4대보험 공제</th><td id="r-ded">–</td></tr>
-        <tr class="tot"><th>4대보험만 뗀 금액</th><td id="r-net">–</td></tr>
+        <tr class="head"><th>월 급여</th><td id="r-gross">3,000,000원</td></tr>
+        <tr class="neg"><th>ㄴ 4대보험 공제</th><td id="r-ded">-272,080원</td></tr>
+        <tr class="tot"><th>4대보험만 뗀 금액</th><td id="r-net">2,727,920원</td></tr>
       </tbody>
     </table>
     <div class="note" style="margin-bottom:0">
@@ -118,7 +118,7 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>월 급여</th><th>근로자 공제</th><th>사업주 부담</th><th>총 인건비</th></tr></thead>
-      <tbody id="cmp"></tbody>
+      <tbody id="cmp"><tr><td>216만</td><td>190,100</td><td>224,930</td><td>2,381,810</td></tr><tr><td>250만</td><td>223,490</td><td>264,430</td><td>2,764,430</td></tr><tr class="hi"><td>300만</td><td>272,080</td><td>321,920</td><td>3,321,920</td></tr><tr><td>350만</td><td>320,660</td><td>379,400</td><td>3,879,400</td></tr><tr><td>400만</td><td>369,260</td><td>436,900</td><td>4,436,900</td></tr><tr><td>500만</td><td>466,430</td><td>551,870</td><td>5,551,870</td></tr><tr><td>600만</td><td>563,600</td><td>666,840</td><td>6,666,840</td></tr></tbody>
     </table>
   </div>
 
@@ -134,6 +134,40 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <h3>월 60시간 미만이면 계산이 달라집니다</h3>
   <p>단시간근로자가 <strong>월 60시간 미만</strong>이면 국민연금과 건강보험은 원칙적으로 적용되지 않습니다. 반면 고용보험은 3개월 이상 계속 일하면 60시간 미만이어도 가입 대상이고, <strong>산재보험은 시간과 무관하게 전원 적용</strong>입니다. 위에서 '월 60시간 미만'을 눌러 차이를 확인해 보세요.</p>
+
+  <!-- PRE:insurance-extra:START -->
+  <h2>월급 250만원 직원 한 명, 회사는 실제로 얼마를 쓰나</h2>
+  <p>월급 2,500,000원(식대 비과세 200,000원 포함), 150인 미만 사업장, 산재보험 평균 요율 기준입니다.</p>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>항목</th><th>직원이 내는 돈</th><th>회사가 내는 돈</th></tr></thead>
+      <tbody>
+        <tr><td>국민연금</td><td>109,250원</td><td>109,250원</td></tr>
+        <tr><td>건강보험</td><td>82,680원</td><td>82,680원</td></tr>
+        <tr><td>장기요양보험</td><td>10,860원</td><td>10,860원</td></tr>
+        <tr><td>고용보험</td><td>20,700원</td><td>20,700원</td></tr>
+        <tr><td>고용안정·직업능력개발</td><td>–</td><td>5,750원</td></tr>
+        <tr><td>산재보험</td><td>–</td><td>35,190원</td></tr>
+        <tr><td>합계</td><td><strong>223,490원</strong></td><td><strong>264,430원</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>직원 통장에서 223,490원이 빠지고, 회사는 월급과 별도로 264,430원을 더 냅니다. 이 직원 한 명에게 회사가 쓰는 돈은 한 달에 <strong>2,764,430원</strong>, 월급의 110.6%입니다.</p>
+  <h3>60세 이상이거나 월 60시간 미만이면</h3>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>경우</th><th>직원 부담</th><th>회사 부담</th><th>회사 총 인건비</th></tr></thead>
+      <tbody>
+        <tr><td>일반 직원</td><td>223,490원</td><td>264,430원</td><td>2,764,430원</td></tr>
+        <tr><td>60세 이상</td><td>114,240원</td><td>155,180원</td><td>2,655,180원</td></tr>
+        <tr><td>월 60시간 미만</td><td>20,700원</td><td>61,640원</td><td>2,561,640원</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>60세 이상이면 국민연금이 빠지고, 월 60시간 미만이면 국민연금과 건강보험·장기요양이 함께 빠집니다. 고용보험과 산재보험은 그대로 남습니다.</p>
+<!-- PRE:insurance-extra:END -->
 
   <h2>자주 묻는 질문</h2>
   <details>

@@ -160,6 +160,120 @@ ${table(['수수료', '부가세 빼먹은 계산', '진짜 남는 돈', '차이
   return blocks;
 }
 
+// ───────────────────────── 시급·주휴수당 ─────────────────────────
+function hourlyBlocks() {
+  const E = engine('labor2026.js', ['LABOR', 'wageWithHoliday', 'won']);
+  const w = E.LABOR.minWage, won = E.won;
+  const full = E.wageWithHoliday(40, w);
+  const naive = full.totalWeekly * E.LABOR.weeksPerMonth;
+  const official = w * E.LABOR.monthlyHours;
+  const rows = [14, 15, 20, 25, 30, 40].map(h => {
+    const x = E.wageWithHoliday(h, w);
+    return [h + '시간', x.holiday.eligible ? won(x.holiday.monthly) + '원' : '없음', won(x.totalMonthly) + '원'];
+  });
+  const m14 = E.wageWithHoliday(14, w).totalMonthly, m15 = E.wageWithHoliday(15, w).totalMonthly;
+  return { 'hourly-extra': `
+  <h2>주급에 4.345를 곱하면 왜 월급과 안 맞을까</h2>
+  <p>2026년 최저시급 ${won(w)}원으로 주 40시간 일하면 주휴수당을 포함한 주급은 ${won(full.totalWeekly)}원입니다. 한 달을 4.345주로 보고 곱하면 <strong>${won(naive)}원</strong>이 나옵니다. 그런데 정부가 공표하는 최저 월급은 <strong>${won(official)}원</strong>(시급 × 209시간)입니다. ${won(official - naive)}원이 차이 납니다.</p>
+  <p>209시간은 주 48시간(근로 40 + 주휴 8)에 4.345를 곱한 208.56시간을 <strong>먼저 반올림한 값</strong>입니다. 시간을 반올림한 뒤 시급을 곱하느냐, 돈에 4.345를 곱하느냐의 차이입니다. 월급 계약서와 맞추려면 시간을 먼저 반올림해야 하고, 이 계산기도 그렇게 계산합니다.</p>
+  <h3>최저시급으로 주 몇 시간 일하면 한 달에 얼마</h3>
+${table(['주 소정근로시간', '월 주휴수당', '월 급여 (주휴 포함)'], rows)}
+  <p>주 14시간과 15시간은 한 시간 차이지만 월 급여는 ${won(m14)}원과 ${won(m15)}원으로 <strong>${won(m15 - m14)}원</strong> 벌어집니다. 15시간부터 주휴수당이 붙기 때문입니다.</p>
+` };
+}
+
+// ───────────────────────── 퇴직금 ─────────────────────────
+function severanceBlocks() {
+  const E = engine('labor2026.js', ['severancePay', 'retirementTax', 'serviceYears', 'averagePeriodDays', 'daysBetween', 'won', 'Date']);
+  const won = E.won, pay = 3000000;
+  const rows = [[2026, 3, 1], [2026, 6, 1], [2026, 9, 1], [2026, 12, 1]].map(([y, m, d]) => {
+    const leave = new E.Date(y, m - 1, d), join = new E.Date(y - 3, m - 1, d);
+    const days = E.daysBetween(join, leave), pd = E.averagePeriodDays(leave);
+    return { label: `${y}년 ${m}월 ${d}일`, days, pd, years: E.serviceYears(join, leave), r: E.severancePay({ days, periodDays: pd, monthlyPay: pay }) };
+  });
+  const hi = rows.reduce((a, b) => b.r.amount > a.r.amount ? b : a);
+  const lo = rows.reduce((a, b) => b.r.amount < a.r.amount ? b : a);
+  const base = rows[0], t = E.retirementTax(base.r.amount, base.days, base.years);
+  return { 'severance-extra': `
+  <h2>같은 3년을 일해도 언제 그만두느냐에 따라 다릅니다</h2>
+  <p>월급 ${won(pay)}원으로 딱 3년을 일하고 퇴직한 경우입니다. 근속기간은 같지만, 평균임금을 구할 때 나누는 <strong>직전 3개월의 달력 일수</strong>가 퇴직일마다 달라서 퇴직금도 달라집니다.</p>
+${table(['퇴직일', '직전 3개월 일수', '1일 평균임금', '퇴직금'], rows.map(x => [x.label, x.pd + '일', won(x.r.dailyAverage) + '원', won(x.r.amount) + '원']))}
+  <p>직전 3개월이 가장 짧은 ${hi.label} 퇴직이 ${won(hi.r.amount)}원으로 가장 많고, 가장 긴 ${lo.label} 퇴직이 ${won(lo.r.amount)}원으로 가장 적습니다. 차이는 ${won(hi.r.amount - lo.r.amount)}원입니다. 같은 석 달 치 월급을 더 적은 일수로 나누면 하루 평균임금이 올라가기 때문입니다.</p>
+  <h3>퇴직소득세는 이렇게 나옵니다 (${base.label} 퇴직 기준)</h3>
+${table(['단계', '계산', '금액'], [
+    ['퇴직금', '위 표 첫 줄', won(base.r.amount) + '원'],
+    ['근속연수공제', `근속 ${t.years}년 기준`, '−' + won(t.yearDed) + '원'],
+    ['환산급여', `(퇴직금 − 근속연수공제) × 12 ÷ ${t.years}`, won(t.converted) + '원'],
+    ['환산급여공제', '환산급여 구간별 공제', '−' + won(t.convDed) + '원'],
+    ['과세표준', '환산급여 − 환산급여공제', won(t.taxBase) + '원'],
+    ['퇴직소득세', `과세표준에 세율을 곱한 뒤 ÷ 12 × ${t.years}`, won(t.incomeTax) + '원'],
+    ['지방소득세', '퇴직소득세 × 10%', won(t.localTax) + '원'],
+    ['실수령 퇴직금', '퇴직금 − 세금', '<strong>' + won(t.net) + '원</strong>'],
+  ])}
+  <p>퇴직금 ${won(base.r.amount)}원에 붙는 세금은 ${won(t.total)}원, 실효세율 ${(t.effectiveRate * 100).toFixed(2)}%입니다. 같은 돈을 월급으로 받았을 때보다 훨씬 적은데, 여러 해에 걸쳐 쌓인 돈을 1년치로 나눠(환산급여) 세율을 매기기 때문입니다.</p>
+` };
+}
+
+// ───────────────────────── 4대보험 ─────────────────────────
+function insuranceBlocks() {
+  const E = engine('insurance2026.js', ['insuranceOf', 'won']);
+  const won = E.won, o = { pay: 2500000, taxFree: 200000, size: 'u150' };
+  const cases = [['일반 직원', {}], ['60세 이상', { over60: true }], ['월 60시간 미만', { shortTime: true }]]
+    .map(([k, x]) => [k, E.insuranceOf({ ...o, ...x })]);
+  const base = cases[0][1];
+  return { 'insurance-extra': `
+  <h2>월급 250만원 직원 한 명, 회사는 실제로 얼마를 쓰나</h2>
+  <p>월급 ${won(o.pay)}원(식대 비과세 ${won(o.taxFree)}원 포함), 150인 미만 사업장, 산재보험 평균 요율 기준입니다.</p>
+${table(['항목', '직원이 내는 돈', '회사가 내는 돈'], base.rows.map(r => [r.label, r.worker ? won(r.worker) + '원' : '–', won(r.employer) + '원'])
+    .concat([['합계', '<strong>' + won(base.workerTotal) + '원</strong>', '<strong>' + won(base.employerTotal) + '원</strong>']]))}
+  <p>직원 통장에서 ${won(base.workerTotal)}원이 빠지고, 회사는 월급과 별도로 ${won(base.employerTotal)}원을 더 냅니다. 이 직원 한 명에게 회사가 쓰는 돈은 한 달에 <strong>${won(base.laborCost)}원</strong>, 월급의 ${(100 + base.burdenRate * 100).toFixed(1)}%입니다.</p>
+  <h3>60세 이상이거나 월 60시간 미만이면</h3>
+${table(['경우', '직원 부담', '회사 부담', '회사 총 인건비'], cases.map(([k, x]) => [k, won(x.workerTotal) + '원', won(x.employerTotal) + '원', won(x.laborCost) + '원']))}
+  <p>60세 이상이면 국민연금이 빠지고, 월 60시간 미만이면 국민연금과 건강보험·장기요양이 함께 빠집니다. 고용보험과 산재보험은 그대로 남습니다.</p>
+` };
+}
+
+// ───────────────────────── 대출 ─────────────────────────
+function loanBlocks() {
+  const E = engine('finance2026.js', ['loanSchedule', 'won']);
+  const won = E.won;
+  const rs = [3.5, 4.0, 4.5, 5.0].map(r => ({ r, s: E.loanSchedule(300000000, r, 360, 'equal', 0) }));
+  return { 'loan-extra': `
+  <h2>금리 0.5%p가 30년 동안 만드는 차이</h2>
+  <p>3억원을 30년 원리금균등으로 빌렸을 때 금리별 월 상환액과 총이자입니다.</p>
+${table(['금리', '월 상환액', '총이자', '갚는 돈 합계'], rs.map(x => [x.r.toFixed(1) + '%', won(x.s.equalPayment) + '원', won(x.s.totalInterest) + '원', won(x.s.totalPayment) + '원']))}
+  <p>4.0%와 4.5%는 월 상환액으로 보면 ${won(rs[2].s.equalPayment - rs[1].s.equalPayment)}원 차이지만, 30년을 모으면 총이자가 <strong>${won(rs[2].s.totalInterest - rs[1].s.totalInterest)}원</strong> 벌어집니다. 금리 0.5%p를 깎는 협상이나 갈아타기가 생각보다 큰돈이 되는 이유입니다. 3.5%와 5.0% 사이의 총이자 차이는 ${won(rs[3].s.totalInterest - rs[0].s.totalInterest)}원입니다.</p>
+` };
+}
+
+// ───────────────────────── 전월세 ─────────────────────────
+function rentBlocks() {
+  const E = engine('finance2026.js', ['FINANCE', 'legalConversionRate', 'jeonseToMonthly', 'monthlyToJeonse', 'won', 'bigWon']);
+  const won = E.won, big = E.bigWon, legal = E.legalConversionRate();
+  const rates = [4, legal, 6];
+  const cv = E.monthlyToJeonse(100000000, 1000000, legal);
+  return { 'rent-extra': `
+  <h2>보증금을 얼마나 낮추면 월세가 얼마나 붙나</h2>
+  <p>전세 보증금에서 낮추는 금액과 전환율에 따른 월세입니다. 가운데 열이 지금 법정 상한(기준금리 ${E.FINANCE.baseRate}% + ${E.FINANCE.rentSpread}% = 연 ${legal}%)입니다.</p>
+${table(['낮추는 보증금'].concat(rates.map(r => '전환율 ' + r + '%')),
+    [50000000, 100000000, 200000000, 300000000].map(g => [big(g)].concat(rates.map(r => won(E.jeonseToMonthly(g, 0, r).monthly) + '원'))))}
+  <p>보증금 1억원을 월세로 돌리면 법정 상한 기준으로 월 ${won(E.jeonseToMonthly(100000000, 0, legal).monthly)}원입니다. 집주인이 이보다 많이 요구하면 전환율이 상한을 넘는 것인지 먼저 계산해 보세요. 다만 상한은 계약 기간 중 전환하거나 갱신할 때 적용되고, 신규 계약에는 적용되지 않습니다.</p>
+  <h3>반대로, 지금 월세는 전세로 치면 얼마일까</h3>
+  <p>보증금 1억원에 월세 100만원인 집은 연 ${legal}% 기준으로 월세를 보증금 ${big(cv.converted)}으로 환산할 수 있습니다. 전세로 치면 <strong>${big(cv.jeonse)}</strong>짜리 집과 같은 조건입니다. 비슷한 전세 매물과 비교할 때 이 숫자를 기준으로 보면 됩니다.</p>
+` };
+}
+
+// ───────────────────────── 평수 ─────────────────────────
+function areaBlocks() {
+  const E = engine('finance2026.js', ['m2ToPyeong']);
+  return { 'area-extra': `
+  <h2>매물에 자주 나오는 전용면적, 평으로는</h2>
+  <p>아파트 매물에는 전용면적이 제곱미터로 적힙니다. 자주 보이는 크기를 평으로 바꾸면 이렇습니다. 1평 = 400/121㎡(약 3.3058㎡)로 계산했습니다.</p>
+${table(['전용면적', '평 (정확한 값)', '3.3으로 나눈 어림값'], [39, 49, 59, 74, 84, 101, 114, 135].map(m => [m + '㎡', E.m2ToPyeong(m).toFixed(1) + '평', (m / 3.3).toFixed(1) + '평']))}
+  <p>3.3으로 나누는 어림셈은 정확한 값보다 조금 크게 나옵니다. 작은 면적에서는 거의 같지만, 계약서처럼 숫자가 정확해야 할 때는 3.3058로 나누세요. 위 표의 평은 전용면적 기준이라, 흔히 말하는 공급면적 평형(예: 84㎡ = 34평형)보다 작습니다.</p>
+` };
+}
+
 // ───────────────────────── 실행 ─────────────────────────
 const PAGES = {
   'annual-leave': {
@@ -172,6 +286,17 @@ const PAGES = {
     fill: ['profit', 'sub', 'flow', 'vat', 'vatNote', 'r-be', 'target'],
     blocks: marginBlocks,
   },
+  hourly: { file: 'hourly.html', blocks: hourlyBlocks,
+    fill: ['cmp', 'holiday', 'r-month', 'r-monthhol', 'r-monthwork', 'r-week', 'r-weekhol', 'r-weekwork', 'r-year', 'sub'] },
+  severance: { file: 'severance.html', blocks: severanceBlocks,
+    fill: ['amount', 'cmp', 'r-amount', 'r-daily', 'r-days', 'r-local', 'r-net', 'r-period', 'r-rate', 'r-tax', 'r-years', 'sub'] },
+  insurance: { file: 'insurance.html', blocks: insuranceBlocks,
+    fill: ['cmp', 'cost', 'costSub', 'r-ded', 'r-gross', 'r-net', 'rowNote', 'rows', 'tot'] },
+  loan: { file: 'loan.html', blocks: loanBlocks,
+    fill: ['cap', 'cmp', 'payment', 'r-first', 'r-grace', 'r-interest', 'r-last', 'r-principal', 'r-total', 'sched', 'sub'] },
+  rent: { file: 'rent.html', blocks: rentBlocks,
+    fill: ['cap', 'cmp', 'out', 'r-deposit', 'r-gap', 'r-jeonse', 'r-legal', 'r-out', 'r-outlabel', 'r-rate', 'sub'] },
+  area: { file: 'area.html', blocks: areaBlocks, fill: ['cmp', 'out'] },
 };
 
 const only = process.argv[2];
@@ -180,7 +305,7 @@ for (const [name, p] of Object.entries(PAGES)) {
   const file = path.join(SITE, p.file);
   let html = fs.readFileSync(file, 'utf8');
   for (const [k, v] of Object.entries(p.blocks())) html = setBlock(html, k, v);
-  html = setBlock(html, 'date', new Date().toISOString().slice(0, 10));
+  if (html.includes('<!-- PRE:date:START -->')) html = setBlock(html, 'date', new Date().toISOString().slice(0, 10));
   fs.writeFileSync(file, html, 'utf8');
 
   // 고유 섹션을 넣은 뒤에 렌더링해야 렌더 결과에 같은 HTML이 담긴다

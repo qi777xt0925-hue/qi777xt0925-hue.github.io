@@ -84,8 +84,8 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <section class="result" aria-live="polite">
     <div class="cap" id="cap">환산 월세</div>
-    <div class="big" id="out">–</div>
-    <div class="sub" id="sub">–</div>
+    <div class="big" id="out">1,666,667원</div>
+    <div class="sub" id="sub">보증금 4억원을 월세로 전환</div>
     <div class="note" id="warn" style="margin-top:14px; text-align:left; display:none"></div>
   </section>
 
@@ -95,12 +95,12 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card">
     <table class="brk">
       <tbody>
-        <tr class="head"><th>전세 보증금</th><td id="r-jeonse">–</td></tr>
-        <tr><th>월세 보증금</th><td id="r-deposit">–</td></tr>
-        <tr><th>전환 대상 금액</th><td id="r-gap">–</td></tr>
-        <tr class="head"><th style="padding-top:18px">적용 전환율</th><td style="padding-top:18px" id="r-rate">–</td></tr>
-        <tr><th>법정 상한</th><td id="r-legal">–</td></tr>
-        <tr class="tot"><th id="r-outlabel">환산 월세</th><td id="r-out">–</td></tr>
+        <tr class="head"><th>전세 보증금</th><td id="r-jeonse">500,000,000원</td></tr>
+        <tr><th>월세 보증금</th><td id="r-deposit">100,000,000원</td></tr>
+        <tr><th>전환 대상 금액</th><td id="r-gap">400,000,000원</td></tr>
+        <tr class="head"><th style="padding-top:18px">적용 전환율</th><td style="padding-top:18px" id="r-rate">5.00%</td></tr>
+        <tr><th>법정 상한</th><td id="r-legal">5% (기준금리 3% + 2%)</td></tr>
+        <tr class="tot"><th id="r-outlabel">환산 월세</th><td id="r-out">1,666,667원</td></tr>
       </tbody>
     </table>
   </div>
@@ -110,7 +110,7 @@ gtag('config', 'G-WDJ3WX61V6');
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>전환율</th><th>월세</th><th>연간 부담</th><th>비고</th></tr></thead>
-      <tbody id="cmp"></tbody>
+      <tbody id="cmp"><tr><td>3%</td><td>1,000,000</td><td>12,000,000</td><td></td></tr><tr><td>3.5%</td><td>1,166,667</td><td>14,000,000</td><td></td></tr><tr><td>4%</td><td>1,333,333</td><td>16,000,000</td><td></td></tr><tr class="hi"><td>5%</td><td>1,666,667</td><td>20,000,000</td><td>법정 상한</td></tr><tr class="hi"><td>5%</td><td>1,666,667</td><td>20,000,000</td><td>법정 상한</td></tr><tr><td>6%</td><td>2,000,000</td><td>24,000,000</td><td>상한 초과</td></tr></tbody>
     </table>
   </div>
 
@@ -125,6 +125,26 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <h3>다만 모든 계약에 적용되지는 않습니다</h3>
   <p>이 상한은 <strong>계약 기간 중 전환하거나 계약갱신요구권을 행사할 때</strong> 강제력을 가집니다. <strong>신규 계약에는 적용되지 않습니다.</strong> 새로 구하는 집이라면 상한을 넘는 조건이어도 위법이 아니므로, 시세와 비교해 판단하셔야 합니다.</p>
+
+  <!-- PRE:rent-extra:START -->
+  <h2>보증금을 얼마나 낮추면 월세가 얼마나 붙나</h2>
+  <p>전세 보증금에서 낮추는 금액과 전환율에 따른 월세입니다. 가운데 열이 지금 법정 상한(기준금리 3% + 2% = 연 5%)입니다.</p>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>낮추는 보증금</th><th>전환율 4%</th><th>전환율 5%</th><th>전환율 6%</th></tr></thead>
+      <tbody>
+        <tr><td>5,000만원</td><td>166,667원</td><td>208,333원</td><td>250,000원</td></tr>
+        <tr><td>1억원</td><td>333,333원</td><td>416,667원</td><td>500,000원</td></tr>
+        <tr><td>2억원</td><td>666,667원</td><td>833,333원</td><td>1,000,000원</td></tr>
+        <tr><td>3억원</td><td>1,000,000원</td><td>1,250,000원</td><td>1,500,000원</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>보증금 1억원을 월세로 돌리면 법정 상한 기준으로 월 416,667원입니다. 집주인이 이보다 많이 요구하면 전환율이 상한을 넘는 것인지 먼저 계산해 보세요. 다만 상한은 계약 기간 중 전환하거나 갱신할 때 적용되고, 신규 계약에는 적용되지 않습니다.</p>
+  <h3>반대로, 지금 월세는 전세로 치면 얼마일까</h3>
+  <p>보증금 1억원에 월세 100만원인 집은 연 5% 기준으로 월세를 보증금 2억 4,000만원으로 환산할 수 있습니다. 전세로 치면 <strong>3억 4,000만원</strong>짜리 집과 같은 조건입니다. 비슷한 전세 매물과 비교할 때 이 숫자를 기준으로 보면 됩니다.</p>
+<!-- PRE:rent-extra:END -->
 
   <h2>자주 묻는 질문</h2>
   <details>
