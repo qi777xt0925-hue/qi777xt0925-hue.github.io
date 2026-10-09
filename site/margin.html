@@ -92,8 +92,8 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <section class="result" aria-live="polite">
     <div class="cap">한 건 팔면 실제로 남는 돈</div>
-    <div class="big" id="profit">–</div>
-    <div class="sub" id="sub">–</div>
+    <div class="big" id="profit">8,655원</div>
+    <div class="sub" id="sub">마진율 31.7% · 정산 입금액 28,020원</div>
   </section>
 
   <div class="note" id="warn" style="display:none"></div>
@@ -103,30 +103,30 @@ gtag('config', 'G-WDJ3WX61V6');
   <h2>돈이 어디로 가나</h2>
   <div class="card">
     <table class="brk">
-      <tbody id="flow"></tbody>
+      <tbody id="flow"><tr class="head"><th>판매가</th><td>30,000원</td></tr><tr class="neg"><th>ㄴ 판매수수료 <span class="hint">수수료 1,800 + 부가세 180</span></th><td>-1,980원</td></tr><tr class="head"><th>정산 입금액</th><td>28,020원</td></tr><tr class="neg"><th>ㄴ 매입원가</th><td>-15,000원</td></tr><tr class="neg"><th>ㄴ 배송비</th><td>-3,000원</td></tr><tr class="neg"><th>ㄴ 기타 비용</th><td>-500원</td></tr><tr class="neg"><th>ㄴ 납부할 부가세</th><td>-865원</td></tr><tr class="tot"><th>남는 돈</th><td>8,655원</td></tr></tbody>
     </table>
   </div>
 
   <h2>부가세 정리</h2>
   <div class="card">
     <table class="brk">
-      <tbody id="vat"></tbody>
+      <tbody id="vat"><tr class="head"><th>매출세액 <span class="hint">판매가에 들어 있던 부가세</span></th><td>2,727원</td></tr><tr class="neg"><th>ㄴ 매입세액 공제 <span class="hint">원가·배송·수수료의 부가세</span></th><td>-1,862원</td></tr><tr class="tot"><th>납부할 부가세</th><td>865원</td></tr></tbody>
     </table>
-    <div class="note" id="vatNote" style="margin-bottom:0"></div>
+    <div class="note" id="vatNote" style="margin-bottom:0">판매가 30,000원 중 공급가액은 <strong>27,273원</strong>입니다. 나머지 2,727원은 맡아 두었다가 신고 때 내는 돈입니다.</div>
   </div>
 
   <h2>가격을 얼마로 매겨야 하나</h2>
   <div class="card">
     <table class="brk">
       <tbody>
-        <tr class="head"><th>손익분기 판매가 <span class="hint">이보다 싸면 손해</span></th><td id="r-be">–</td></tr>
+        <tr class="head"><th>손익분기 판매가 <span class="hint">이보다 싸면 손해</span></th><td id="r-be">19,807원</td></tr>
       </tbody>
     </table>
   </div>
   <div class="card scroll">
     <table class="cmp">
       <thead><tr><th>목표 마진율</th><th>판매가</th><th>남는 돈</th></tr></thead>
-      <tbody id="target"></tbody>
+      <tbody id="target"><tr><td>10.0%</td><td>22,182원</td><td>2,017원</td></tr><tr><td>20.0%</td><td>25,204원</td><td>4,583원</td></tr><tr><td>30.0%</td><td>29,180원</td><td>7,958원</td></tr><tr><td>40.0%</td><td>34,644원</td><td>12,598원</td></tr><tr><td>50.0%</td><td>42,627원</td><td>19,376원</td></tr></tbody>
     </table>
   </div>
 
@@ -142,6 +142,51 @@ gtag('config', 'G-WDJ3WX61V6');
 
   <h3>매입에 세금계산서가 없으면 공제가 안 됩니다</h3>
   <p>이 계산기는 매입·배송·기타 비용 모두 <strong>세금계산서나 신용카드 매출전표를 받았다고 전제</strong>합니다. 간이영수증이나 현금 거래로 증빙이 없으면 매입세액 공제를 받지 못해 실제 이익은 계산보다 줄어듭니다.</p>
+
+  <!-- PRE:margin-example:START -->
+  <h2>예시: 3만원짜리 한 건을 따라가 보면</h2>
+  <p>위 계산기의 기본값(판매가 30,000원 · 매입원가 15,000원 · 수수료 6% · 배송비 3,000원 · 포장 500원 · 일반과세자)을 단계별로 풀었습니다. 표의 숫자는 계산기와 같은 계산식으로 만든 것입니다.</p>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>단계</th><th>계산</th><th>금액</th></tr></thead>
+      <tbody>
+        <tr><td>고객이 낸 돈</td><td>판매가</td><td>30,000원</td></tr>
+        <tr><td>수수료</td><td>30,000 × 6% + 수수료 부가세 10%</td><td>−1,980원</td></tr>
+        <tr><td>정산 입금액</td><td>판매가 − 수수료</td><td>28,020원</td></tr>
+        <tr><td>내가 낸 비용</td><td>원가 15,000 + 배송 3,000 + 포장 500</td><td>−18,500원</td></tr>
+        <tr><td>여기까지 남은 돈</td><td>입금액 − 비용</td><td>9,520원</td></tr>
+        <tr><td>받은 부가세</td><td>30,000 ÷ 11</td><td>2,727원</td></tr>
+        <tr><td>낸 부가세 (공제)</td><td>원가·배송·포장 ÷ 11 + 수수료 부가세</td><td>−1,862원</td></tr>
+        <tr><td>신고 때 낼 부가세</td><td>받은 부가세 − 낸 부가세</td><td>−865원</td></tr>
+        <tr><td>진짜 남는 돈</td><td>여기까지 남은 돈 − 낼 부가세</td><td><strong>8,655원</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>정산금에서 비용만 빼면 9,520원이 남은 것 같지만, 그중 865원은 다음 부가세 신고 때 나라에 내야 하는 돈입니다. 진짜 남는 돈은 <strong>8,655원, 마진율 31.7%</strong>입니다.</p>
+<!-- PRE:margin-example:END -->
+
+  
+
+  <!-- PRE:margin-compare:START -->
+  <h2>수수료율별로 얼마나 착각하게 되나</h2>
+  <p>같은 3만원짜리 상품을 수수료율만 바꿔 팔았을 때입니다. '부가세 빼먹은 계산'은 정산금에서 비용만 뺀 금액이고, '진짜 남는 돈'은 일반과세자가 부가세 신고까지 마친 뒤 남는 금액입니다.</p>
+
+  <div class="card scroll">
+    <table class="cmp">
+      <thead><tr><th>수수료</th><th>부가세 빼먹은 계산</th><th>진짜 남는 돈</th><th>차이</th></tr></thead>
+      <tbody>
+        <tr><td>카드 3.3%</td><td>10,411원</td><td>9,465원</td><td>−946원</td></tr>
+        <tr><td>스마트스토어 6%</td><td>9,520원</td><td>8,655원</td><td>−865원</td></tr>
+        <tr><td>오픈마켓 12%</td><td>7,540원</td><td>6,855원</td><td>−685원</td></tr>
+        <tr><td>배달앱 30%</td><td>1,600원</td><td>1,455원</td><td>−145원</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>차이는 신고 때 낼 부가세만큼입니다. 수수료가 클수록 차이가 줄어드는 것은 수수료에 붙은 부가세를 공제받기 때문입니다. </p>
+
+  <p>연 매출 4,800만원 미만이라 부가세 납부가 면제되는 간이과세자는 왼쪽 '부가세 빼먹은 계산'이 실제로 남는 돈과 같습니다. 그보다 매출이 큰 간이과세자는 업종별 부가율에 따른 세금을 내므로 그 사이 어딘가가 됩니다.</p>
+<!-- PRE:margin-compare:END -->
 
   <h2>자주 묻는 질문</h2>
   <details>
@@ -167,7 +212,8 @@ gtag('config', 'G-WDJ3WX61V6');
     일반과세자 모드는 매입·배송·기타 비용과 판매수수료의 부가세를 모두 매입세액으로 공제할 수 있다고 전제합니다(적격 증빙이 있어야 합니다).
     간이과세·면세 모드는 부가세를 분리하지 않고 총액으로 계산하므로, 업종별 부가율에 따른 납부세액이 있는 간이과세자는 실제 이익이 조금 더 적습니다.
     인건비·임대료 같은 고정비와 반품·폐기 손실은 반영하지 않았습니다.
-    참고용 자료이며 세무 판단의 근거로 사용할 수 없습니다.
+    참고용 자료이며 세무 판단의 근거로 사용할 수 없습니다.<br>
+근거: <a href="https://www.law.go.kr/법령/부가가치세법">부가가치세법</a> · 최종 확인 <!-- PRE:date:START -->2026-10-09<!-- PRE:date:END -->
   </div>
 
   <h2>함께 보면 좋은 계산기</h2>
