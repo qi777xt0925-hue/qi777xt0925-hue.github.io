@@ -2,3 +2,6 @@ node_modules/
 .env
 site/_drafts/
 *.log
+
+# health.mjs 점검 결과 (워크플로가 이슈 본문으로만 씀)
+pipeline/health-report.md

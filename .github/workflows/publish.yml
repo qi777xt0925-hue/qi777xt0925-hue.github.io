@@ -262,6 +262,38 @@ jobs:
             echo "**배포를 자동으로 걸지 못했습니다.** Actions 탭에서 \`사이트 배포\`를 수동 실행해 주세요." >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      # 배포를 "걸었다"와 글이 "떴다"는 다른 사실입니다. 9/28에는 커밋까지 됐는데 사흘간 사이트에 없었습니다.
+      # 이번 커밋에서 새로 생긴 글 주소를 실제로 열어 보고, 10분 안에 안 뜨면 이슈로 알립니다.
+      # 비용 0원. 발행은 이미 끝난 상태라, 실패해도 이슈를 남기고 실행을 실패로 표시할 뿐입니다.
+      - name: 새 글이 실제로 떴는지 확인
+        if: steps.diff.outputs.posts == 'true' && steps.preflight.outputs.mode == 'direct'
+        working-directory: pipeline
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          NEW=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- ../site/posts \
+            | sed -n 's#^site/posts/\(.*\)\.html$#\1#p' | paste -sd, -)
+          if [ -z "$NEW" ]; then
+            echo "새로 추가된 글이 없어 확인을 건너뜁니다."
+            exit 0
+          fi
+
+          if node health.mjs --expect "$NEW" --wait 600; then
+            cat health-report.md >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          cat health-report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\nActions 탭에서 `사이트 배포`를 수동 실행하면 대개 해결됩니다.\n\n실행 기록: %s\n' "$RUN_URL" >> health-report.md
+          gh label create "점검" --color D93F0B --description "사이트 점검에서 문제 발견" 2>/dev/null || true
+          gh issue create --title "발행한 글이 사이트에 뜨지 않았습니다 ($(date -u +%Y-%m-%d))" \
+               --label "점검" --body-file health-report.md \
+            || gh issue create --title "발행한 글이 사이트에 뜨지 않았습니다 ($(date -u +%Y-%m-%d))" \
+                 --body-file health-report.md \
+            || echo "::warning::이슈 생성에 실패했습니다: $RUN_URL"
+          exit 1
+
       # PR 생성이 막혀 있어도 브랜치는 남기고, 수동으로 열 수 있는 링크를 띄웁니다.
       # 실패해도 워크플로를 죽이지 않습니다. 글은 이미 브랜치와 아티팩트에 있습니다.
       - name: Pull Request 생성
