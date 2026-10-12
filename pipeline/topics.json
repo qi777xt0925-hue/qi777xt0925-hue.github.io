@@ -422,7 +422,9 @@
       "href": "../salary.html",
       "label": "연봉 실수령액 계산기"
     },
-    "published": null
+    "published": "2026-10-12",
+    "h1": "이직확인서 상실사유 코드 23, 26, 11 뭐가 다른가",
+    "description": "고용보험 상실신고서의 상실사유 코드에 따라 실업급여 수급자격이 갈린다. 11·12·22·23·26·32 코드의 차이와 코드가 잘못 찍혔을 때 정정하는 절차를 사례로 정리했다."
   },
   {
     "slug": "yeoncha-sudang-toesa-jeongsan",
