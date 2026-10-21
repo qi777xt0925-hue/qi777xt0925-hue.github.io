@@ -2,6 +2,8 @@
   "siteName": "계산기랩",
   "origin": "https://qi777xt0925-hue.github.io",
   "author": "계산기랩",
+  "ga": "G-WDJ3WX61V6",
+  "adsense": "ca-pub-5824419927261947",
   "model": "claude-sonnet-5",
   "effort": "medium",
   "maxTokens": 16000,

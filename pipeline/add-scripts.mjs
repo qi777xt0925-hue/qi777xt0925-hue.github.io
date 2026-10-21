@@ -6,18 +6,16 @@
 //   node add-scripts.mjs --ga G-XXXXXXXXXX --adsense ca-pub-0000000000000000
 //   node add-scripts.mjs --remove
 //
-// build.mjs가 guides.html을 다시 만들면 그 페이지의 스크립트는 지워지므로
-// 순서는 항상 build.mjs → add-scripts.mjs 입니다.
+// 새 글과 guides.html은 render.mjs가 site.config.json의 ga·adsense 값으로 직접 채웁니다.
+// 이 스크립트는 ID를 바꾸거나 손으로 만든 페이지에 일괄 반영할 때 씁니다.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { START, END, scriptsPayload } from './lib/scripts.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SITE = path.join(HERE, '..', 'site');
-
-const START = '<!-- SCRIPTS:START -->';
-const END = '<!-- SCRIPTS:END -->';
 
 // 소유권 확인용 파일은 내용이 바뀌면 인증이 깨질 수 있어 건드리지 않습니다.
 const SKIP = /^(google[0-9a-f]+|naver[0-9a-f]+)\.html$/;
@@ -44,27 +42,7 @@ if (adsense && !/^ca-pub-\d{10,}$/.test(adsense)) {
   process.exit(1);
 }
 
-function block() {
-  if (remove) return '';
-  const parts = [];
-  if (ga) {
-    parts.push(`<script async src="https://www.googletagmanager.com/gtag/js?id=${ga}"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${ga}');
-</script>`);
-  }
-  if (adsense) {
-    parts.push(
-      `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsense}" crossorigin="anonymous"></script>`
-    );
-  }
-  return parts.join('\n');
-}
-
-const payload = block();
+const payload = remove ? '' : scriptsPayload({ ga, adsense });
 
 // site/ 아래 모든 html을 모읍니다(하위 폴더 포함).
 function walk(dir) {

@@ -1,6 +1,8 @@
 // 생성된 글 데이터를 사이트 디자인에 맞는 정적 HTML로 변환합니다.
 // 클래스 이름은 site/assets/style.css에 이미 정의된 것만 사용합니다.
 
+import { scriptsBlock } from './scripts.mjs';
+
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
 
@@ -167,7 +169,7 @@ export function renderPost(article, topic, config, date, others = [], modified =
 <script type="application/ld+json">${jsonLd}</script>
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="${FAVICON}">
-<!-- SCRIPTS:START --><!-- SCRIPTS:END -->
+${scriptsBlock(config)}
 </head>
 <body>
 
@@ -234,7 +236,7 @@ export function renderIndexPage(posts, config) {
 <meta property="og:locale" content="ko_KR">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" href="${FAVICON}">
-<!-- SCRIPTS:START --><!-- SCRIPTS:END -->
+${scriptsBlock(config)}
 </head>
 <body>
 
