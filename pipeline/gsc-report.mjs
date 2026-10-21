@@ -33,6 +33,8 @@ const PROPERTY = `${config.origin}/`;
 const SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const API = 'https://searchconsole.googleapis.com';
 const SITE_START = '2026-08-22'; // 최초 배포일
+// 응답이 없으면 무한정 기다리지 않습니다. 첫 실행이 이 때문에 5분 넘게 멈췄습니다.
+const TIMEOUT = 30000;
 
 const raw = process.env.GSC_SA_KEY;
 if (!raw) {
@@ -59,6 +61,7 @@ async function accessToken() {
   const sig = crypto.createSign('RSA-SHA256').update(`${head}.${claim}`).sign(key.private_key, 'base64url');
   const res = await fetch(key.token_uri, {
     method: 'POST',
+    signal: AbortSignal.timeout(TIMEOUT),
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -73,8 +76,10 @@ async function accessToken() {
 const token = await accessToken();
 
 async function call(method, url, body) {
+  console.error(`→ ${method} ${url.split('?')[0]}`);
   const res = await fetch(API + url, {
     method,
+    signal: AbortSignal.timeout(TIMEOUT),
     headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
   });
