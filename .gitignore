@@ -5,3 +5,4 @@ site/_drafts/
 
 # health.mjs 점검 결과 (워크플로가 이슈 본문으로만 씀)
 pipeline/health-report.md
+pipeline/gsc-report.md

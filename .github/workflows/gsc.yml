@@ -1,0 +1,37 @@
+name: 서치콘솔 현황
+
+# 서치콘솔의 클릭·노출·색인 상태를 읽어 실행 요약에 정리합니다. 읽기 전용, 비용 0원.
+# 내용은 pipeline/gsc-report.mjs 맨 위에 적혀 있습니다.
+#
+# 필요한 것: 저장소 Secrets 의 GSC_SA_KEY (서비스 계정 열쇠 JSON).
+# 그 서비스 계정은 서치콘솔에 "제한됨" 권한으로만 추가돼 있습니다.
+# 그만두려면 서치콘솔 설정 > 사용자 및 권한에서 그 계정을 지우면 됩니다.
+on:
+  schedule:
+    # 실적이 2~3일 늦게 채워지므로 월요일 발행 사흘 뒤에 봅니다.
+    - cron: '0 0 * * 4' # UTC 목 00:00 = KST 목 09:00
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 서치콘솔 읽기
+        working-directory: pipeline
+        env:
+          GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
+        run: node gsc-report.mjs
+
+      - name: 결과 요약
+        if: always()
+        run: cat pipeline/gsc-report.md >> "$GITHUB_STEP_SUMMARY" || true
