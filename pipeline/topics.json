@@ -491,10 +491,12 @@
       "피부양자 재산기준"
     ],
     "related": {
-      "href": "../index.html",
-      "label": "계산기 전체 목록"
+      "href": "../insurance.html",
+      "label": "4대보험 계산기"
     },
-    "published": null
+    "published": "2026-11-16",
+    "h1": "건강보험 피부양자 탈락 기준, 연 2천만원은 무엇을 더한 금액인가",
+    "description": "피부양자 소득요건 연 2천만원은 수입이 아니라 소득금액 합계다. 사업소득 예외 500만원, 재산 과세표준 5억4천만원·9억원 기준과 탈락 후 지역보험료를 2026년 요율로 계산했다."
   },
   {
     "slug": "gukmin-yeongeum-chunab",
